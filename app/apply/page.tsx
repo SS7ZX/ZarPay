@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { ApplicationForm } from "@/src/components/forms/application-form";
 import { ConfigMessage } from "@/src/components/common/config-message";
 import { getAuthenticatedProfile } from "@/src/lib/auth";
@@ -15,6 +16,7 @@ export default function ApplyPage() {
 }
 
 async function AuthenticatedApplyPage() {
+  await connection();
   const { profile } = await getAuthenticatedProfile();
   if (profile.role !== "borrower") redirect("/dashboard");
   return <ApplicationForm applicantName={profile.full_name} />;

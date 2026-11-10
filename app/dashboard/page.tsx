@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { ConfigMessage } from "@/src/components/common/config-message";
 import { DashboardClient } from "@/src/components/dashboard/dashboard-client";
 import { getAuthenticatedProfile } from "@/src/lib/auth";
@@ -43,6 +44,7 @@ export default function DashboardPage() {
 }
 
 async function AuthenticatedDashboard() {
+  await connection();
   const { supabase, profile, email } = await getAuthenticatedProfile();
   const { data: rows, error } = await supabase
     .from("applications")
