@@ -1,5 +1,7 @@
 "use client";
 
+import { BrandLogo } from "@/src/components/common/brand-logo";
+
 interface ErrorPageProps {
   error: Error & { digest?: string };
   reset: () => void;
@@ -9,7 +11,7 @@ export default function ErrorPage({ reset }: ErrorPageProps) {
   return (
     <main className="setup-screen">
       <section className="setup-card" role="alert">
-        <div className="brand-mark">Z</div>
+        <BrandLogo />
         <p className="eyebrow">TERJADI GANGGUAN</p>
         <h1>Halaman tidak dapat dimuat</h1>
         <p>

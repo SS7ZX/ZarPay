@@ -1,8 +1,10 @@
+import { BrandLogo } from "@/src/components/common/brand-logo";
+
 export function ConfigMessage() {
   return (
     <main className="setup-screen">
       <div className="setup-card">
-        <div className="brand-mark">Z</div>
+        <BrandLogo />
         <p className="eyebrow">PENYIAPAN DIPERLUKAN</p>
         <h1>Hubungkan project Supabase Anda</h1>
         <p>

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import { BrandLogo } from "@/src/components/common/brand-logo";
 import type {
   ApplicationRecord,
   ApplicationStatus,
@@ -174,8 +175,7 @@ export function DashboardClient({
     <div className="app-shell">
       <aside className="sidebar">
         <Link className="brand-lockup" href="/dashboard" aria-label="ZarPay dashboard">
-          <span className="brand-mark">Z</span>
-          <span>ZarPay</span>
+          <BrandLogo />
         </Link>
         <div className="workspace-label">WORKSPACE</div>
         <nav className="side-nav" aria-label="Navigasi utama">

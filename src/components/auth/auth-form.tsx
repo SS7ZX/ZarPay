@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import { BrandLogo } from "@/src/components/common/brand-logo";
 
 interface AuthFormProps {
   siteUrl: string;
@@ -67,8 +68,7 @@ export function AuthForm({ siteUrl, initialError = "" }: AuthFormProps) {
     <main className="auth-screen">
       <section className="auth-card">
         <Link className="brand-lockup" href="/" aria-label="ZarPay beranda">
-          <span className="brand-mark">Z</span>
-          <span>ZarPay</span>
+          <BrandLogo />
         </Link>
         <p className="eyebrow">PENILAIAN KREDIT YANG TRANSPARAN</p>
         <h1>{mode === "signin" ? "Selamat datang kembali" : "Buat akun ZarPay"}</h1>

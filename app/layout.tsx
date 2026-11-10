@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ZarPay — Penilaian Kredit Transparan",
+  title: "ZarPay | Simulasi Penilaian Kredit",
   description:
-    "Platform simulasi penilaian kredit dan analisis risiko pinjaman yang transparan.",
+    "Simulasikan cicilan dan rasio DTI, lalu pahami faktor di balik skor penilaian akademik ZarPay.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

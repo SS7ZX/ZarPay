@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BrandLogo } from "@/src/components/common/brand-logo";
 
 type IconName = "score" | "shield" | "chart" | "review" | "borrower" | "evaluator";
 
@@ -68,35 +69,35 @@ function LineIcon({ name }: { name: IconName }) {
 const features = [
   {
     icon: "score" as const,
-    title: "Skor yang bisa dijelaskan",
+    title: "Skor dengan rincian faktor",
     description:
-      "Lihat skor 300–850 beserta kontribusi setiap faktor. Tidak ada angka misterius tanpa konteks.",
+      "Lihat nilai simulasi pada skala 300 sampai 850 beserta poin dari setiap faktor.",
   },
   {
     icon: "chart" as const,
-    title: "DTI dengan cicilan baru",
+    title: "Rasio utang setelah pinjaman",
     description:
-      "Bandingkan kewajiban saat ini dengan pendapatan setelah estimasi cicilan pinjaman ikut dihitung.",
+      "Perkiraan cicilan ditambahkan ke kewajiban bulanan sebelum rasio DTI dihitung.",
   },
   {
     icon: "review" as const,
-    title: "Alur evaluasi terstruktur",
+    title: "Tinjauan pengajuan",
     description:
-      "Evaluator meninjau profil, faktor risiko, dan status pengajuan pada satu dashboard.",
+      "Evaluator dapat meninjau data dan status pengajuan dari dashboard.",
   },
   {
     icon: "shield" as const,
-    title: "Akses berbasis peran",
+    title: "Akses sesuai peran",
     description:
-      "Peminjam hanya melihat pengajuannya sendiri. Akses evaluator diberikan oleh administrator.",
+      "Peminjam hanya dapat melihat pengajuannya sendiri. Administrator mengatur akses evaluator.",
   },
 ];
 
 const scoreTiers = [
-  { range: "740–850", label: "Risiko rendah", detail: "Profil simulasi relatif kuat", className: "tier-low" },
-  { range: "670–739", label: "Risiko moderat", detail: "Tinjau faktor pembentuk skor", className: "tier-moderate" },
-  { range: "580–669", label: "Perlu perhatian", detail: "Ada faktor yang perlu dievaluasi", className: "tier-elevated" },
-  { range: "300–579", label: "Risiko tinggi", detail: "Simulasi menunjukkan tekanan risiko", className: "tier-high" },
+  { range: "740 sampai 850", label: "Risiko rendah", className: "tier-low" },
+  { range: "670 sampai 739", label: "Risiko moderat", className: "tier-moderate" },
+  { range: "580 sampai 669", label: "Perlu perhatian", className: "tier-elevated" },
+  { range: "300 sampai 579", label: "Risiko tinggi", className: "tier-high" },
 ];
 
 export function LandingPage() {
@@ -105,19 +106,39 @@ export function LandingPage() {
       <header className="landing-header">
         <div className="landing-container landing-nav">
           <Link className="brand-lockup" href="/" aria-label="ZarPay beranda">
-            <span className="brand-mark">Z</span>
-            <span>ZarPay</span>
+            <BrandLogo markOnly />
           </Link>
-          <nav className="landing-nav-links" aria-label="Navigasi landing page">
+          <nav className="landing-nav-links" aria-label="Navigasi utama">
             <a href="#fitur">Fitur</a>
             <a href="#cara-kerja">Cara kerja</a>
             <a href="#penilaian">Skala penilaian</a>
             <a href="#faq">FAQ</a>
           </nav>
+          <details className="landing-mobile-menu">
+            <summary>
+              <svg
+                aria-hidden="true"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeWidth="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+              <span>Menu</span>
+            </summary>
+            <nav aria-label="Navigasi halaman">
+              <a href="#fitur">Fitur</a>
+              <a href="#cara-kerja">Cara kerja</a>
+              <a href="#penilaian">Skala penilaian</a>
+              <a href="#faq">FAQ</a>
+            </nav>
+          </details>
           <div className="landing-nav-actions">
             <Link className="landing-login-link" href="/login">Masuk</Link>
             <Link className="button button-primary landing-nav-cta" href="/login">
-              Mulai simulasi <span aria-hidden="true">→</span>
+              Masuk atau daftar
             </Link>
           </div>
         </div>
@@ -128,114 +149,99 @@ export function LandingPage() {
           <div className="hero-copy">
             <div className="hero-kicker">
               <span className="hero-kicker-dot" />
-              PLATFORM SIMULASI PENILAIAN KREDIT
+              Simulasi penilaian kredit
             </div>
             <h1>
-              Kenali risiko.
+              Hitung cicilan.
               <br />
-              <span>Pahami keputusan.</span>
+              <span>Pahami hasilnya.</span>
             </h1>
             <p className="hero-description">
-              ZarPay membantu peminjam dan evaluator memahami kemampuan bayar
-              melalui skor kredit yang transparan, rasio DTI, dan faktor risiko
-              yang mudah ditelusuri.
+              Masukkan pendapatan, kewajiban, dan rencana pinjaman untuk melihat
+              estimasi cicilan, rasio utang terhadap pendapatan (DTI), serta
+              faktor yang membentuk skor.
             </p>
             <div className="hero-actions">
               <Link className="button button-primary hero-primary-cta" href="/login">
-                Mulai simulasi <span aria-hidden="true">→</span>
+                Masuk atau daftar
               </Link>
               <a className="hero-secondary-cta" href="#cara-kerja">
-                Pelajari cara kerja <span aria-hidden="true">↓</span>
+                Lihat cara kerja <span aria-hidden="true">↓</span>
               </a>
             </div>
             <div className="hero-footnote">
               <span className="hero-footnote-icon" aria-hidden="true">i</span>
-              Simulasi akademik — bukan keputusan pinjaman aktual.
+              Untuk pembelajaran. Gunakan data contoh, bukan informasi keuangan pribadi.
             </div>
           </div>
 
-          <div className="hero-art" aria-label="Pratinjau dashboard penilaian ZarPay">
-            <div className="hero-orbit hero-orbit-one" />
-            <div className="hero-orbit hero-orbit-two" />
-            <div className="hero-art-dot dot-one" />
-            <div className="hero-art-dot dot-two" />
+          <div className="hero-art" role="group" aria-label="Contoh tampilan hasil simulasi">
             <div className="preview-window">
               <div className="preview-window-top">
-                <div className="preview-brand">
-                  <span className="preview-brand-mark">Z</span>
-                  <span>Ringkasan risiko</span>
-                </div>
-                <span className="preview-sample-tag">CONTOH SIMULASI</span>
+                <strong className="preview-brand">Hasil simulasi</strong>
+                <span className="preview-sample-tag">Data ilustrasi</span>
               </div>
               <div className="preview-person">
-                <span className="preview-person-avatar">AR</span>
-                <span><strong>Profil peminjam</strong><small>Contoh data, bukan pengguna nyata</small></span>
-                <span className="preview-status">Menunggu tinjauan</span>
+                <span className="preview-person-avatar" aria-hidden="true">i</span>
+                <span><strong>Profil contoh</strong><small>Angka tidak mewakili pengguna nyata</small></span>
               </div>
               <div className="preview-score-card">
                 <div className="preview-score-copy">
-                  <span>SKOR KREDIT</span>
+                  <span>Skor simulasi</span>
                   <strong>742</strong>
-                  <small>Rentang simulasi 300–850</small>
+                  <small>Skala 300 sampai 850</small>
                   <span className="preview-risk">Risiko rendah</span>
                 </div>
                 <div className="preview-gauge" aria-hidden="true">
                   <div className="preview-gauge-inner">
-                    <strong>742</strong><span>SKOR</span>
+                    <strong>742</strong><span>Skor</span>
                   </div>
                 </div>
               </div>
               <div className="preview-dti">
                 <div className="preview-dti-heading">
-                  <span>Debt-to-Income (DTI)</span>
+                  <span>DTI setelah cicilan</span>
                   <strong>28,4%</strong>
                 </div>
                 <div className="preview-dti-track"><span /></div>
-                <small>Estimasi setelah cicilan pinjaman baru</small>
+                <small>Utang bulanan dibandingkan dengan pendapatan</small>
               </div>
               <div className="preview-factors">
                 <div><span className="factor-indicator factor-positive">+</span><span>Riwayat kredit</span><strong>Baik</strong></div>
                 <div><span className="factor-indicator factor-neutral">↗</span><span>Rasio utang</span><strong>Terukur</strong></div>
               </div>
             </div>
-            <div className="floating-insight">
-              <span className="floating-insight-icon"><LineIcon name="chart" /></span>
-              <span><strong>Faktor transparan</strong><small>Setiap skor punya penjelasan</small></span>
-              <span className="floating-arrow" aria-hidden="true">↗</span>
-            </div>
-            <span className="hero-art-caption">DASHBOARD · PRATINJAU VISUAL</span>
           </div>
         </div>
       </section>
 
-      <section className="landing-proof-strip" aria-label="Kapabilitas ZarPay">
+      <section className="landing-proof-strip" aria-label="Cakupan simulasi ZarPay">
         <div className="landing-container proof-grid">
-          <div><strong>300–850</strong><span>rentang skor kredit</span></div>
-          <div><strong>DTI</strong><span>kemampuan bayar terukur</span></div>
-          <div><strong>6 faktor</strong><span>pembentuk skor dijelaskan</span></div>
-          <div><strong>2 peran</strong><span>peminjam & evaluator</span></div>
+          <div><strong>Skor 300 sampai 850</strong><span>Rentang nilai simulasi</span></div>
+          <div><strong>Estimasi cicilan</strong><span>Asumsi bunga tahunan 12%</span></div>
+          <div><strong>Enam faktor penilaian</strong><span>Poin setiap faktor ditampilkan</span></div>
+          <div><strong>DTI pascapinjaman</strong><span>Memperhitungkan estimasi cicilan</span></div>
         </div>
       </section>
 
       <section className="landing-section feature-section" id="fitur">
         <div className="landing-container">
           <div className="section-intro">
-            <span className="landing-eyebrow">DIBANGUN UNTUK KEJELASAN</span>
-            <h2>Penilaian risiko yang mudah dipahami</h2>
+            <span className="landing-eyebrow">Fitur</span>
+            <h2>Informasi untuk memahami hasil simulasi</h2>
             <p>
-              Informasi pinjaman diringkas menjadi sinyal yang relevan, bukan
-              sekadar angka yang sulit ditafsirkan.
+              Periksa estimasi cicilan, rasio utang, dan rincian skor dalam satu
+              tempat.
             </p>
           </div>
           <div className="feature-grid">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <article className="feature-card" key={feature.title}>
-                <div className={`feature-icon feature-icon-${index + 1}`}>
+                <div className="feature-icon">
                   <LineIcon name={feature.icon} />
                 </div>
                 <h3>{feature.title}</h3>
                 <p>{feature.description}</p>
-                <span className="feature-index">0{index + 1}</span>
               </article>
             ))}
           </div>
@@ -245,28 +251,28 @@ export function LandingPage() {
       <section className="landing-section process-section" id="cara-kerja">
         <div className="landing-container process-layout">
           <div className="section-intro process-intro">
-            <span className="landing-eyebrow">ALUR YANG SEDERHANA</span>
-            <h2>Dari profil ke penilaian, dalam tiga langkah</h2>
+            <span className="landing-eyebrow">Cara kerja</span>
+            <h2>Mulai dari data, lanjutkan dengan hasil</h2>
             <p>
-              Isi profil simulasi, pahami hasilnya, lalu tinjau status pengajuan
-              secara terstruktur.
+              Isi profil keuangan untuk melihat hasil simulasi. Peminjam juga
+              dapat memantau status pengajuan setelah dikirim.
             </p>
             <Link className="text-link" href="/login">
-              Buat akun untuk memulai <span aria-hidden="true">→</span>
+              Masuk atau daftar <span aria-hidden="true">→</span>
             </Link>
           </div>
           <div className="process-steps">
             <article className="process-step">
-              <span className="process-number">01</span>
-              <div><h3>Lengkapi profil keuangan</h3><p>Masukkan pendapatan, kewajiban, kondisi pekerjaan, dan rencana pinjaman.</p></div>
+              <span className="process-icon"><LineIcon name="borrower" /></span>
+              <div><h3>Isi profil keuangan</h3><p>Masukkan pendapatan, kewajiban bulanan, kondisi pekerjaan, dan rencana pinjaman.</p></div>
             </article>
             <article className="process-step">
-              <span className="process-number">02</span>
-              <div><h3>Pahami skor dan DTI</h3><p>Lihat estimasi cicilan, rasio utang pascapinjaman, kategori risiko, dan faktor pembentuk skor.</p></div>
+              <span className="process-icon"><LineIcon name="score" /></span>
+              <div><h3>Tinjau hasil simulasi</h3><p>Lihat estimasi cicilan, rasio DTI, kategori risiko, dan poin dari setiap faktor.</p></div>
             </article>
             <article className="process-step">
-              <span className="process-number">03</span>
-              <div><h3>Pantau tinjauan</h3><p>Peminjam melihat statusnya; evaluator meninjau pengajuan sesuai akses peran.</p></div>
+              <span className="process-icon"><LineIcon name="review" /></span>
+              <div><h3>Pantau status pengajuan</h3><p>Setelah dikirim, peminjam dapat memeriksa status dan evaluator dapat meninjau pengajuan.</p></div>
             </article>
           </div>
         </div>
@@ -275,22 +281,21 @@ export function LandingPage() {
       <section className="landing-section scoring-section" id="penilaian">
         <div className="landing-container scoring-layout">
           <div className="section-intro scoring-intro">
-            <span className="landing-eyebrow">PENILAIAN TERBUKA</span>
-            <h2>Skor punya konteks. Risiko punya alasan.</h2>
+            <span className="landing-eyebrow">Metode penilaian</span>
+            <h2>Ketahui cara skor dihitung</h2>
             <p>
-              Simulasi skor berada pada rentang 300 sampai 850. Hasil
-              dikelompokkan agar lebih mudah dibaca, bukan untuk menggantikan
-              pemeriksaan kredit profesional.
+              Skor dimulai dari 300, lalu poin dari enam faktor ditambahkan.
+              Nilai akhirnya dibatasi sampai 850.
             </p>
             <div className="scoring-note">
               <span aria-hidden="true">i</span>
-              Model saat ini menggunakan aturan contoh dan asumsi bunga 12% per
-              tahun untuk menghitung cicilan.
+              Aturan ini dibuat untuk proyek akademik dan belum divalidasi untuk
+              menilai pengajuan pinjaman nyata.
             </div>
           </div>
           <div className="tier-panel">
             <div className="tier-panel-heading">
-              <div><span className="landing-eyebrow">KATEGORI SIMULASI</span><h3>Skala skor ZarPay</h3></div>
+              <div><span className="landing-eyebrow">Rentang skor</span><h3>Kategori hasil simulasi</h3></div>
               <span className="tier-scale-label">300 <i /> 850</span>
             </div>
             <div className="tier-list">
@@ -298,15 +303,19 @@ export function LandingPage() {
                 <div className="tier-row" key={tier.range}>
                   <span className={`tier-marker ${tier.className}`} />
                   <strong className="tier-range">{tier.range}</strong>
-                  <span className="tier-label"><strong>{tier.label}</strong><small>{tier.detail}</small></span>
-                  <span className={`tier-mini-pill ${tier.className}`}>Skor</span>
+                  <span className="tier-label"><strong>{tier.label}</strong></span>
                 </div>
               ))}
             </div>
-            <div className="factor-chips">
-              <span>DTI pascapinjaman</span><span>Pendapatan</span><span>Stabilitas kerja</span>
-              <span>Riwayat kredit</span><span>Beban pinjaman</span><span>Tunggakan terbaru</span>
-            </div>
+            <p className="factor-list-label">Faktor yang masuk ke dalam perhitungan</p>
+            <ul className="factor-list">
+              <li>Rasio utang terhadap pendapatan</li>
+              <li>Pendapatan bulanan</li>
+              <li>Lama bekerja</li>
+              <li>Riwayat kredit</li>
+              <li>Jumlah pinjaman</li>
+              <li>Tunggakan terbaru</li>
+            </ul>
           </div>
         </div>
       </section>
@@ -314,76 +323,79 @@ export function LandingPage() {
       <section className="landing-section audience-section">
         <div className="landing-container">
           <div className="section-intro audience-intro">
-            <span className="landing-eyebrow">SATU PLATFORM, DUA PERSPEKTIF</span>
-            <h2>Dirancang untuk peminjam dan evaluator</h2>
+            <span className="landing-eyebrow">Peran pengguna</span>
+            <h2>Fitur untuk peminjam dan evaluator</h2>
           </div>
           <div className="audience-grid">
             <article className="audience-card borrower-card">
               <div className="audience-icon"><LineIcon name="borrower" /></div>
-              <span className="audience-label">UNTUK PEMINJAM</span>
+              <span className="audience-label">Peminjam</span>
               <h3>Kenali kemampuan bayar Anda</h3>
               <p>
                 Buat simulasi, pahami faktor yang memengaruhi skor, dan pantau
                 status pengajuan dari dashboard pribadi.
               </p>
-              <Link className="text-link" href="/login">Mulai sebagai peminjam <span aria-hidden="true">→</span></Link>
+              <Link className="text-link" href="/login">Masuk atau daftar <span aria-hidden="true">→</span></Link>
             </article>
             <article className="audience-card evaluator-card">
               <div className="audience-icon"><LineIcon name="evaluator" /></div>
-              <span className="audience-label">UNTUK EVALUATOR</span>
+              <span className="audience-label">Evaluator</span>
               <h3>Tinjau profil dengan konteks</h3>
               <p>
-                Telusuri skor, DTI, serta faktor risiko dan catat status
-                evaluasi pada pengajuan yang dapat Anda akses.
+                Tinjau profil, skor, DTI, dan faktor penilaian. Akses evaluator
+                diaktifkan oleh administrator.
               </p>
-              <Link className="text-link" href="/login">Masuk sebagai evaluator <span aria-hidden="true">→</span></Link>
+              <p className="audience-access-note">Tidak tersedia melalui pendaftaran mandiri.</p>
             </article>
           </div>
-          <p className="role-footnote">
-            Akun baru terdaftar sebagai peminjam. Peran evaluator hanya dapat
-            diatur oleh administrator project.
-          </p>
         </div>
       </section>
 
       <section className="landing-section faq-section" id="faq">
         <div className="landing-container faq-layout">
           <div className="section-intro">
-            <span className="landing-eyebrow">PERTANYAAN UMUM</span>
-            <h2>Hal yang perlu diketahui</h2>
-            <p>Transparansi juga berarti menjelaskan batasan simulasi.</p>
+            <span className="landing-eyebrow">Pertanyaan umum</span>
+            <h2>Informasi sebelum Anda mulai</h2>
+            <p>Ketahui batasan perhitungan dan pengelolaan akses.</p>
           </div>
           <div className="faq-list">
             <details>
-              <summary>Apakah skor ZarPay adalah skor kredit resmi?</summary>
+              <summary>Apakah skor ini digunakan oleh bank atau biro kredit?</summary>
               <p>
-                Bukan. Skor dihitung dari aturan simulasi akademik yang
-                transparan dan tidak terhubung ke biro kredit atau lembaga
-                keuangan.
+                Tidak. Skor dihitung dari aturan simulasi di aplikasi ini dan
+                tidak terhubung ke bank atau biro kredit.
               </p>
             </details>
             <details>
-              <summary>Apakah hasil simulasi menjamin pinjaman disetujui?</summary>
+              <summary>Apakah hasilnya menjamin pinjaman disetujui?</summary>
               <p>
-                Tidak. Hasil bukan persetujuan, penawaran, atau rekomendasi
-                finansial. Keputusan nyata memerlukan pemeriksaan dan kebijakan
-                lembaga pemberi pinjaman.
+                Tidak. Hasilnya bukan persetujuan, penawaran, atau rekomendasi
+                keuangan. Keputusan pinjaman nyata ditentukan oleh pemberi
+                pinjaman melalui proses mereka sendiri.
               </p>
             </details>
             <details>
-              <summary>Bagaimana estimasi cicilan dan DTI dihitung?</summary>
+              <summary>Bagaimana cicilan dan DTI dihitung?</summary>
               <p>
-                Cicilan menggunakan rumus angsuran bulanan tetap dengan asumsi
-                bunga 12% per tahun. DTI menghitung kewajiban bulanan saat ini
-                ditambah estimasi cicilan baru, dibagi pendapatan bulanan.
+                Estimasi cicilan memakai asumsi bunga tahunan 12% dengan
+                angsuran bulanan tetap. DTI membandingkan kewajiban bulanan,
+                termasuk estimasi cicilan, dengan pendapatan bulanan. Biaya lain
+                tidak termasuk.
               </p>
             </details>
             <details>
               <summary>Siapa yang dapat melihat pengajuan saya?</summary>
               <p>
-                Peminjam hanya dapat membaca pengajuannya sendiri. Evaluator
-                dapat meninjau data sesuai peran yang diberikan administrator,
-                dengan pembatasan akses di aplikasi dan database.
+                Peminjam dapat melihat pengajuannya sendiri. Evaluator hanya
+                mendapat akses setelah administrator mengaktifkan perannya.
+              </p>
+            </details>
+            <details>
+              <summary>Bagaimana data yang saya masukkan digunakan?</summary>
+              <p>
+                Pengajuan disimpan dalam database aplikasi agar hasil dan
+                statusnya dapat ditampilkan. Untuk proyek akademik ini, gunakan
+                data contoh dan hindari informasi keuangan atau identitas pribadi.
               </p>
             </details>
           </div>
@@ -393,14 +405,13 @@ export function LandingPage() {
       <section className="landing-cta-section">
         <div className="landing-container landing-cta">
           <div>
-            <span className="landing-eyebrow">MULAI DENGAN INFORMASI YANG JELAS</span>
-            <h2>Siap memahami profil risiko Anda?</h2>
-            <p>Buat akun untuk memulai simulasi dan melihat hasil yang dapat dijelaskan.</p>
+            <span className="landing-eyebrow">Mulai menggunakan ZarPay</span>
+            <h2>Lihat perhitungan simulasi Anda</h2>
+            <p>Masuk ke akun atau daftar sebagai peminjam untuk mengisi profil keuangan.</p>
           </div>
           <Link className="button landing-cta-button" href="/login">
-            Mulai simulasi <span aria-hidden="true">→</span>
+            Masuk atau daftar <span aria-hidden="true">→</span>
           </Link>
-          <div className="cta-decoration" aria-hidden="true">Z</div>
         </div>
       </section>
 
@@ -408,19 +419,19 @@ export function LandingPage() {
         <div className="landing-container footer-top">
           <div className="footer-brand">
             <Link className="brand-lockup" href="/">
-              <span className="brand-mark">Z</span><span>ZarPay</span>
+              <BrandLogo />
             </Link>
-            <p>Simulasi penilaian kredit yang transparan untuk pembelajaran risiko pinjaman.</p>
+            <p>Alat simulasi akademik untuk memahami skor dan risiko pinjaman.</p>
           </div>
           <div className="footer-links">
-            <div><strong>Jelajahi</strong><a href="#fitur">Fitur</a><a href="#cara-kerja">Cara kerja</a><a href="#penilaian">Skala penilaian</a></div>
-            <div><strong>Akun</strong><Link href="/login">Masuk / daftar</Link><Link href="/dashboard">Dashboard</Link></div>
-            <div><strong>Catatan</strong><a href="#faq">Pertanyaan umum</a><span>Proyek akademik</span></div>
+            <div><strong>Jelajahi</strong><a href="#fitur">Fitur</a><a href="#cara-kerja">Cara kerja</a><a href="#penilaian">Metode penilaian</a></div>
+            <div><strong>Akun</strong><Link href="/login">Masuk atau daftar</Link><Link href="/dashboard">Dashboard</Link></div>
+            <div><strong>Informasi</strong><a href="#faq">Pertanyaan umum</a><span>Simulasi akademik</span></div>
           </div>
         </div>
         <div className="landing-container footer-bottom">
           <span>© ZarPay</span>
-          <span>Hasil merupakan simulasi, bukan keputusan kredit aktual.</span>
+          <span>Hasil simulasi bukan keputusan pinjaman.</span>
         </div>
       </footer>
     </main>
