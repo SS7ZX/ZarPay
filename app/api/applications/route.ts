@@ -1,7 +1,9 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { calculateScore } from "@/src/lib/scoringEngine";
 import { isSameOriginRequest, jsonError } from "@/src/lib/http";
 import { validateApplication } from "@/src/lib/validators";
+import { getApplicationSaveErrorMessage } from "@/src/lib/application-save-error";
 import {
   getServiceRoleKey,
   getSupabaseEnvironment,
@@ -83,8 +85,19 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error("Failed to save loan application:", error.message);
-    return jsonError("Pengajuan gagal disimpan. Silakan coba kembali.", 500);
+    const reference = randomUUID();
+    console.error("Failed to save loan application:", {
+      reference,
+      code: error.code,
+      message: error.message,
+    });
+    return NextResponse.json(
+      {
+        error: getApplicationSaveErrorMessage(error.code),
+        reference,
+      },
+      { status: 500 },
+    );
   }
 
   return NextResponse.json({ application, scoring }, { status: 201 });

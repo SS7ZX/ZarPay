@@ -175,6 +175,10 @@ export function DashboardClient({
             <span className="nav-symbol" aria-hidden="true">⌂</span>
             Ringkasan
           </Link>
+          <Link className="side-nav-link" href="/profile">
+            <span className="nav-symbol" aria-hidden="true">◎</span>
+            Profil saya
+          </Link>
           {!evaluator && (
             <Link className="side-nav-link" href="/apply">
               <span className="nav-symbol" aria-hidden="true">＋</span>

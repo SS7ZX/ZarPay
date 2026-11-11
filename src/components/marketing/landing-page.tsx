@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { BrandLogo } from "@/src/components/common/brand-logo";
 import { LandingSections } from "@/src/components/marketing/landing-sections";
+import { LandingAccountActions } from "@/src/components/marketing/landing-account-actions";
+import { getSupabaseEnvironment } from "@/src/lib/supabase/env";
 
 export function LandingPage() {
   return (
@@ -52,12 +54,7 @@ export function LandingPage() {
               <a href="#faq">FAQ</a>
             </nav>
           </details>
-          <div className="landing-nav-actions">
-            <Link className="landing-login-link" href="/login">Masuk</Link>
-            <Link className="button button-primary landing-nav-cta" href="/login">
-              Mulai simulasi
-            </Link>
-          </div>
+          <LandingAccountActions enabled={Boolean(getSupabaseEnvironment())} />
         </div>
       </header>
 

@@ -10,11 +10,11 @@ import {
   isDatabaseSetupError,
   SupabaseSchemaSetupError,
 } from "@/src/lib/supabase/schema-errors";
+import { parseScoreFactors } from "@/src/lib/score-factors";
 import type {
   ApplicationStatus,
   DashboardApplication,
   DashboardStats,
-  ScoreFactor,
 } from "@/src/types";
 
 const PAGE_SIZE = 25;
@@ -50,34 +50,6 @@ function isUuid(value: string): boolean {
 
 function escapeLikePattern(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
-}
-
-function parseScoreFactors(value: unknown): ScoreFactor[] {
-  if (!Array.isArray(value)) {
-    throw new Error("Data faktor skor tidak valid pada database.");
-  }
-  return value.map((factor) => {
-    if (
-      typeof factor !== "object" ||
-      factor === null ||
-      !("label" in factor) ||
-      !("points" in factor) ||
-      !("maximum" in factor) ||
-      !("explanation" in factor) ||
-      typeof factor.label !== "string" ||
-      typeof factor.points !== "number" ||
-      typeof factor.maximum !== "number" ||
-      typeof factor.explanation !== "string"
-    ) {
-      throw new Error("Data faktor skor tidak valid pada database.");
-    }
-    return {
-      label: factor.label,
-      points: factor.points,
-      maximum: factor.maximum,
-      explanation: factor.explanation,
-    };
-  });
 }
 
 export default function DashboardPage({ searchParams }: DashboardPageProps) {

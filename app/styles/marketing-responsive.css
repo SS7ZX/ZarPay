@@ -111,6 +111,11 @@
     gap: 11px;
   }
 
+  .landing-logout-button {
+    padding: 0 4px;
+    font-size: 11px;
+  }
+
   .landing-login-link {
     font-size: 13px;
   }
@@ -447,6 +452,19 @@
 
   .landing-nav-actions {
     gap: 0;
+  }
+
+  .landing-profile-link {
+    display: none;
+  }
+
+  .landing-nav-actions .signout-control {
+    margin-left: 2px;
+  }
+
+  .landing-logout-button {
+    padding: 0 4px;
+    font-size: 10px;
   }
 
   .landing-nav-cta {

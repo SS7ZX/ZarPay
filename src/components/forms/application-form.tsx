@@ -95,7 +95,11 @@ function responseMessage(payload: unknown): string {
     "error" in payload &&
     typeof payload.error === "string"
   ) {
-    return payload.error;
+    const reference =
+      "reference" in payload && typeof payload.reference === "string"
+        ? payload.reference
+        : "";
+    return reference ? `${payload.error} (Ref: ${reference})` : payload.error;
   }
   return "Pengajuan gagal disimpan. Silakan coba kembali.";
 }
