@@ -3,8 +3,10 @@ import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { ApplicationForm } from "@/src/components/forms/application-form";
 import { ConfigMessage } from "@/src/components/common/config-message";
+import { DatabaseSetupMessage } from "@/src/components/common/database-setup-message";
 import { getAuthenticatedProfile } from "@/src/lib/auth";
 import { getSupabaseEnvironment } from "@/src/lib/supabase/env";
+import { SupabaseSchemaSetupError } from "@/src/lib/supabase/schema-errors";
 
 export default function ApplyPage() {
   if (!getSupabaseEnvironment()) return <ConfigMessage />;
@@ -17,7 +19,15 @@ export default function ApplyPage() {
 
 async function AuthenticatedApplyPage() {
   await connection();
-  const { profile } = await getAuthenticatedProfile();
+  let profile;
+  try {
+    ({ profile } = await getAuthenticatedProfile());
+  } catch (error) {
+    if (error instanceof SupabaseSchemaSetupError) {
+      return <DatabaseSetupMessage />;
+    }
+    throw error;
+  }
   if (profile.role !== "borrower") redirect("/dashboard");
   return <ApplicationForm applicantName={profile.full_name} />;
 }

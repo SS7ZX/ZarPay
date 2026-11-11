@@ -2,9 +2,14 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { ConfigMessage } from "@/src/components/common/config-message";
+import { DatabaseSetupMessage } from "@/src/components/common/database-setup-message";
 import { DashboardClient } from "@/src/components/dashboard/dashboard-client";
 import { getAuthenticatedProfile } from "@/src/lib/auth";
 import { getSupabaseEnvironment } from "@/src/lib/supabase/env";
+import {
+  isDatabaseSetupError,
+  SupabaseSchemaSetupError,
+} from "@/src/lib/supabase/schema-errors";
 import type {
   ApplicationStatus,
   DashboardApplication,
@@ -86,11 +91,24 @@ export default function DashboardPage({ searchParams }: DashboardPageProps) {
 
 async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
   await connection();
-  const { supabase, profile, email } = await getAuthenticatedProfile();
+  let authenticated: Awaited<ReturnType<typeof getAuthenticatedProfile>>;
+  try {
+    authenticated = await getAuthenticatedProfile();
+  } catch (error) {
+    if (error instanceof SupabaseSchemaSetupError) {
+      return <DatabaseSetupMessage />;
+    }
+    throw error;
+  }
+  const { supabase, profile, email } = authenticated;
   const params = await searchParams;
   const searchQuery = (firstValue(params.q) ?? "").trim().slice(0, 100);
   const statusFilter = parseStatus(firstValue(params.status));
   const requestedPage = parsePage(firstValue(params.page));
+
+  if (!supabase) {
+    throw new Error("Supabase client tidak tersedia.");
+  }
 
   const applicationCountQuery = supabase
     .from("applications")
@@ -114,14 +132,25 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
     supabase.rpc("dashboard_stats"),
   ]);
   if (countResult.error) {
-    console.error("Failed to count dashboard applications:", countResult.error.message);
+    console.error(
+      "Failed to count dashboard applications:",
+      countResult.error.code,
+      countResult.error.message,
+    );
+    if (isDatabaseSetupError(countResult.error)) {
+      return <DatabaseSetupMessage />;
+    }
     throw new Error("Jumlah pengajuan gagal dimuat.");
   }
   if (statsResult.error || !statsResult.data?.[0]) {
     console.error(
       "Failed to load dashboard statistics:",
+      statsResult.error?.code,
       statsResult.error?.message ?? "No statistics row returned.",
     );
+    if (!statsResult.error || isDatabaseSetupError(statsResult.error)) {
+      return <DatabaseSetupMessage />;
+    }
     throw new Error("Ringkasan pengajuan gagal dimuat.");
   }
 
@@ -161,7 +190,14 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   if (error) {
-    console.error("Failed to load dashboard applications:", error.message);
+    console.error(
+      "Failed to load dashboard applications:",
+      error.code,
+      error.message,
+    );
+    if (isDatabaseSetupError(error)) {
+      return <DatabaseSetupMessage />;
+    }
     throw new Error("Daftar pengajuan gagal dimuat.");
   }
 
@@ -174,7 +210,14 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
     : { data: [], error: null };
 
   if (profilesError) {
-    console.error("Failed to load borrower names:", profilesError.message);
+    console.error(
+      "Failed to load borrower names:",
+      profilesError.code,
+      profilesError.message,
+    );
+    if (isDatabaseSetupError(profilesError)) {
+      return <DatabaseSetupMessage />;
+    }
     throw new Error("Nama peminjam gagal dimuat.");
   }
   const names = new Map((profiles ?? []).map((item) => [item.id, item.full_name]));

@@ -60,6 +60,21 @@ The scoring formula and 12% APR payment estimate are illustrative rules for an a
 
 The application returns a setup screen when the public Supabase URL/key are missing. Provide the public variables during the production build because Next.js embeds `NEXT_PUBLIC_*` values into the client bundle. API writes also require `SUPABASE_SERVICE_ROLE_KEY`; the key is used only in server routes and must be kept secret.
 
+### Troubleshoot a dashboard error after login
+
+Successful Supabase Auth does not confirm that the application schema is installed. If login succeeds but `/dashboard` fails, check the Vercel runtime logs and confirm that both migrations above were applied to the same Supabase project configured in Vercel. The app now repairs a missing profile for an authenticated account as a borrower; it never grants evaluator access automatically.
+
+You can check the required schema objects without reading application data in the Supabase SQL Editor:
+
+```sql
+select
+  to_regclass('public.profiles') as profiles_table,
+  to_regclass('public.applications') as applications_table,
+  to_regprocedure('public.dashboard_stats()') as dashboard_stats_function;
+```
+
+Any `null` result means the matching object is missing. Apply the migration files in filename order after checking that you are in the correct project. The hardening migration intentionally stops if existing Rupiah amounts contain fractions; reconcile those records explicitly rather than rounding them silently. If the schema is present, inspect the Vercel runtime log's error code and the table grants/RLS policies. Never share `.env` values or the service-role key.
+
 ## Run locally
 
 ```bash
