@@ -131,7 +131,11 @@ export function DashboardClient({
       if (!result || result.id !== application.id) {
         throw new Error("Respons keputusan tidak valid. Muat ulang dashboard.");
       }
-      const updated = { ...application, ...result };
+      const updated = {
+        ...application,
+        ...result,
+        reviewer_name: profile.full_name,
+      };
       setSelected((current) =>
         current?.id === application.id ? { ...current, ...updated } : current,
       );

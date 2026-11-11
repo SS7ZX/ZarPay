@@ -8,6 +8,7 @@ import {
   dashboardDateFormat,
   dashboardPageHref,
   initials,
+  riskLabels,
   statusLabels,
 } from "./dashboard-utils";
 
@@ -114,6 +115,7 @@ export function ApplicationList({
                 <th>Peminjam</th>
                 <th>Jumlah pinjaman</th>
                 <th>Skor kredit</th>
+                <th>Risiko</th>
                 <th>Rasio DTI</th>
                 <th>Status</th>
                 <th>Tanggal</th>
@@ -136,6 +138,11 @@ export function ApplicationList({
                   </td>
                   <td>{currencyFormat.format(application.loan_amount)}</td>
                   <td><ScoreBadge score={application.credit_score} /></td>
+                  <td>
+                    <span className={`risk-pill risk-${application.risk_tier}`}>
+                      {riskLabels[application.risk_tier]}
+                    </span>
+                  </td>
                   <td>{(application.dti_ratio * 100).toFixed(1)}%</td>
                   <td>
                     <span className={`status-pill status-${application.status}`}>

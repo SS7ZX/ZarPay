@@ -144,7 +144,7 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
   const applicationQuery = supabase
     .from("applications")
     .select(
-      "id, borrower_id, applicant_name, monthly_income, monthly_debt, loan_amount, loan_term_months, estimated_payment, dti_ratio, employment_years, credit_history_years, recent_defaults, credit_score, risk_tier, score_factors, status, reviewed_at, review_note, created_at",
+      "id, borrower_id, applicant_name, monthly_income, monthly_debt, loan_amount, loan_term_months, estimated_payment, dti_ratio, employment_years, credit_history_years, recent_defaults, credit_score, risk_tier, score_factors, status, reviewed_at, reviewed_by, review_note, created_at",
     );
   if (statusFilter !== "all") {
     applicationQuery.eq("status", statusFilter);
@@ -178,11 +178,22 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
   }
 
   const borrowerIds = [...new Set((rows ?? []).map((row) => row.borrower_id))];
-  const { data: profiles, error: profilesError } = borrowerIds.length
+  const reviewerIds =
+    profile.role === "evaluator"
+      ? [
+          ...new Set(
+            (rows ?? [])
+              .map((row) => row.reviewed_by)
+              .filter((id): id is string => Boolean(id)),
+          ),
+        ]
+      : [];
+  const profileIds = [...new Set([...borrowerIds, ...reviewerIds])];
+  const { data: profiles, error: profilesError } = profileIds.length
     ? await supabase
         .from("profiles")
         .select("id, full_name")
-        .in("id", borrowerIds)
+        .in("id", profileIds)
     : { data: [], error: null };
 
   if (profilesError) {
@@ -200,7 +211,9 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
   const applications: DashboardApplication[] = (rows ?? []).map((row) => ({
     ...row,
     score_factors: parseScoreFactors(row.score_factors),
-    reviewed_by: null,
+    reviewer_name: row.reviewed_by
+      ? names.get(row.reviewed_by) ?? null
+      : null,
     borrower_name: names.get(row.borrower_id) ?? row.applicant_name,
   }));
   const statsRow = statsResult.data[0];

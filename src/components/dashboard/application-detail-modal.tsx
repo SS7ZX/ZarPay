@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import type { DashboardApplication } from "@/src/types";
 import {
   currencyFormat,
+  dashboardDateTimeFormat,
   riskLabels,
   statusLabels,
 } from "./dashboard-utils";
@@ -32,6 +33,9 @@ export function ApplicationDetailModal({
   reviewNoteError,
 }: ApplicationDetailModalProps) {
   const modalRef = useRef<HTMLElement | null>(null);
+  const [decisionToConfirm, setDecisionToConfirm] = useState<
+    "approved" | "declined" | null
+  >(null);
 
   useEffect(() => {
     const dialog = modalRef.current;
@@ -121,10 +125,42 @@ export function ApplicationDetailModal({
           </div>
         </div>
         <div className="detail-metrics">
-          <div><span>Pinjaman</span><strong>{currencyFormat.format(application.loan_amount)}</strong></div>
-          <div><span>Estimasi cicilan / bln</span><strong>{currencyFormat.format(application.estimated_payment)}</strong></div>
-          <div><span>DTI pascapinjaman</span><strong>{(application.dti_ratio * 100).toFixed(1)}%</strong></div>
-          <div><span>Tenor</span><strong>{application.loan_term_months} bulan</strong></div>
+          <div>
+            <span>Pendapatan bulanan</span>
+            <strong>{currencyFormat.format(application.monthly_income)}</strong>
+          </div>
+          <div>
+            <span>Kewajiban bulanan saat ini</span>
+            <strong>{currencyFormat.format(application.monthly_debt)}</strong>
+          </div>
+          <div>
+            <span>Pinjaman</span>
+            <strong>{currencyFormat.format(application.loan_amount)}</strong>
+          </div>
+          <div>
+            <span>Estimasi cicilan / bln</span>
+            <strong>{currencyFormat.format(application.estimated_payment)}</strong>
+          </div>
+          <div>
+            <span>DTI pascapinjaman</span>
+            <strong>{(application.dti_ratio * 100).toFixed(1)}%</strong>
+          </div>
+          <div>
+            <span>Tenor</span>
+            <strong>{application.loan_term_months} bulan</strong>
+          </div>
+          <div>
+            <span>Lama bekerja</span>
+            <strong>{application.employment_years} tahun</strong>
+          </div>
+          <div>
+            <span>Riwayat kredit</span>
+            <strong>{application.credit_history_years} tahun</strong>
+          </div>
+          <div>
+            <span>Tunggakan terbaru dilaporkan</span>
+            <strong>{application.recent_defaults ? "Ya" : "Tidak"}</strong>
+          </div>
         </div>
         <div className="factor-heading">
           <h3>Faktor pembentuk skor</h3>
@@ -142,6 +178,22 @@ export function ApplicationDetailModal({
             </li>
           ))}
         </ul>
+        {application.status !== "pending" && (
+          <div className="review-audit">
+            <div>
+              <span>Keputusan dicatat</span>
+              <strong>
+                {application.reviewed_at
+                  ? dashboardDateTimeFormat.format(new Date(application.reviewed_at))
+                  : "Waktu tidak tersedia"}
+              </strong>
+            </div>
+            <div>
+              <span>Evaluator</span>
+              <strong>{application.reviewer_name ?? "Nama tidak tersedia"}</strong>
+            </div>
+          </div>
+        )}
         {application.review_note ? (
           <div className="review-note-display">
             <h3>Catatan keputusan simulasi</h3>
@@ -150,7 +202,10 @@ export function ApplicationDetailModal({
         ) : application.status !== "pending" ? (
           <div className="review-note-display">
             <h3>Catatan keputusan simulasi</h3>
-            <p>Catatan tidak tersedia untuk keputusan yang tercatat sebelum pembaruan ini.</p>
+            <p>
+              Catatan tidak tersedia untuk keputusan yang tercatat sebelum
+              pembaruan ini.
+            </p>
           </div>
         ) : null}
         <div className="modal-footer">
@@ -185,25 +240,69 @@ export function ApplicationDetailModal({
                   </span>
                 )}
               </div>
-              {actionError && <p className="alert alert-error" role="alert">{actionError}</p>}
-              <div className="review-actions">
-                <button
-                  className="button button-quiet"
-                  disabled={busy}
-                  onClick={() => onReview("declined")}
-                  type="button"
+              {actionError && (
+                <p className="alert alert-error" role="alert">
+                  {actionError}
+                </p>
+              )}
+              {decisionToConfirm ? (
+                <div
+                  aria-labelledby="review-confirmation-title"
+                  aria-live="polite"
+                  className="review-confirmation"
                 >
-                  Tolak simulasi
-                </button>
-                <button
-                  className="button button-primary"
-                  disabled={busy}
-                  onClick={() => onReview("approved")}
-                  type="button"
-                >
-                  {busy ? "Menyimpan..." : "Setujui simulasi"}
-                </button>
-              </div>
+                  <div>
+                    <strong id="review-confirmation-title">
+                      Konfirmasi{" "}
+                      {decisionToConfirm === "approved"
+                        ? "persetujuan"
+                        : "penolakan"}
+                    </strong>
+                    <p>
+                      Keputusan ini akan dicatat dan tidak dapat diubah dari
+                      panel. Ini hanya keputusan simulasi, bukan persetujuan
+                      pinjaman atau pencairan dana.
+                    </p>
+                  </div>
+                  <div className="review-confirmation-actions">
+                    <button
+                      className="button button-quiet"
+                      disabled={busy}
+                      onClick={() => setDecisionToConfirm(null)}
+                      type="button"
+                    >
+                      Periksa kembali
+                    </button>
+                    <button
+                      className="button button-primary"
+                      disabled={busy}
+                      onClick={() => onReview(decisionToConfirm)}
+                      type="button"
+                    >
+                      {busy ? "Menyimpan..." : "Konfirmasi dan simpan"}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="review-actions">
+                  <button
+                    className="button button-quiet"
+                    disabled={busy}
+                    onClick={() => setDecisionToConfirm("declined")}
+                    type="button"
+                  >
+                    Tolak simulasi
+                  </button>
+                  <button
+                    className="button button-primary"
+                    disabled={busy}
+                    onClick={() => setDecisionToConfirm("approved")}
+                    type="button"
+                  >
+                    Setujui simulasi
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

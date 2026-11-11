@@ -328,6 +328,22 @@
     padding: 18px;
   }
 
+  .detail-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-audit {
+    grid-template-columns: 1fr;
+  }
+
+  .review-confirmation-actions {
+    flex-direction: column-reverse;
+  }
+
+  .review-confirmation-actions .button {
+    width: 100%;
+  }
+
   .modal-footer {
     align-items: flex-start;
     flex-direction: column;
@@ -384,7 +400,8 @@
 
 @media (max-width: 420px) {
   .profile-summary-grid,
-  .profile-analysis-grid {
+  .profile-analysis-grid,
+  .detail-metrics {
     grid-template-columns: 1fr;
   }
 

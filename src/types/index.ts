@@ -60,6 +60,7 @@ export interface ApplicationRecord {
 
 export interface DashboardApplication extends ApplicationRecord {
   borrower_name: string;
+  reviewer_name: string | null;
 }
 
 export interface DashboardStats {

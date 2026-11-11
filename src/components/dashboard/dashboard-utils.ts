@@ -13,6 +13,12 @@ export const dashboardDateFormat = new Intl.DateTimeFormat("id-ID", {
   timeZone: "Asia/Jakarta",
 });
 
+export const dashboardDateTimeFormat = new Intl.DateTimeFormat("id-ID", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Jakarta",
+});
+
 export const statusLabels: Record<ApplicationStatus, string> = {
   pending: "Menunggu tinjauan",
   approved: "Disetujui (simulasi)",
