@@ -26,7 +26,6 @@ async function LoginContent({ searchParams }: LoginPageProps) {
   } = await supabase.auth.getUser();
   if (user) redirect("/dashboard");
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const { error } = await searchParams;
   const initialError =
     error === "confirmation"
@@ -34,5 +33,5 @@ async function LoginContent({ searchParams }: LoginPageProps) {
       : error === "configuration"
         ? "Autentikasi belum dikonfigurasi dengan lengkap."
         : "";
-  return <AuthForm initialError={initialError} siteUrl={siteUrl} />;
+  return <AuthForm initialError={initialError} />;
 }

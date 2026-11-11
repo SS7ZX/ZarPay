@@ -11,6 +11,10 @@ import { useRouter } from "next/navigation";
 import { calculateScore } from "@/src/lib/scoringEngine";
 import { validateApplication } from "@/src/lib/validators";
 import type { ApplicationInput, ScoringResult } from "@/src/types";
+import {
+  ApplicationResult,
+  ScorePreviewCard,
+} from "@/src/components/forms/application-display";
 
 interface ApplicationFormProps {
   applicantName: string;
@@ -78,16 +82,10 @@ const initialValues = (): FormValues => ({
   monthlyIncome: "",
   monthlyDebt: "",
   loanAmount: "",
-  loanTermMonths: "12",
+  loanTermMonths: "",
   employmentYears: "",
   creditHistoryYears: "",
-  recentDefaults: false,
-});
-
-const currency = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  maximumFractionDigits: 0,
+  recentDefaults: "",
 });
 
 function responseMessage(payload: unknown): string {
@@ -188,66 +186,19 @@ export function ApplicationForm({ applicantName }: ApplicationFormProps) {
 
   if (result) {
     return (
-      <div className="result-screen">
-        <section className="result-card">
-          <div className="result-check" aria-hidden="true">✓</div>
-          <p className="eyebrow">PENGAJUAN TERSIMPAN</p>
-          <h1>Penilaian simulasi Anda siap</h1>
-          <p className="muted-copy">
-            Referensi #{applicationId.slice(0, 8).toUpperCase()} · Data tersimpan
-            pada akun Anda.
-          </p>
-          <div className="result-score">
-            <strong>{result.creditScore}</strong>
-            <span>SKOR KREDIT</span>
-          </div>
-          <div className="result-summary-grid">
-            <div>
-              <span>Kategori risiko</span>
-              <strong className={`risk-pill risk-${result.riskTier}`}>
-                {result.riskTier === "low"
-                  ? "Risiko rendah"
-                  : result.riskTier === "moderate"
-                    ? "Risiko moderat"
-                    : result.riskTier === "elevated"
-                      ? "Perlu perhatian"
-                      : "Risiko tinggi"}
-              </strong>
-            </div>
-            <div>
-              <span>Rasio DTI</span>
-              <strong>{(result.dtiRatio * 100).toFixed(1)}%</strong>
-            </div>
-            <div>
-              <span>Estimasi cicilan / bulan</span>
-              <strong>{currency.format(result.estimatedPayment)}</strong>
-            </div>
-          </div>
-          <p className="disclaimer">
-            Simulasi menggunakan estimasi bunga 12% per tahun dan aturan contoh.
-            Ini bukan penawaran, persetujuan, atau keputusan kredit nyata.
-          </p>
-          <div className="result-actions">
-            <Link className="button button-primary" href="/dashboard">
-              Lihat dashboard
-            </Link>
-            <button
-              className="button button-quiet"
-              onClick={() => {
-                setResult(null);
-                setValues(initialValues());
-              }}
-              type="button"
-            >
-              Buat simulasi lain
-            </button>
-          </div>
-        </section>
-      </div>
+      <ApplicationResult
+        applicationId={applicationId}
+        onCreateAnother={() => {
+          setResult(null);
+          setValues(initialValues());
+          setErrors({});
+          setRequestError("");
+        }}
+        result={result}
+      />
     );
   }
 
-  const previewTier = preview?.riskTier;
   const setNumeric = (field: FieldName) => (event: ChangeEvent<HTMLInputElement>) =>
     update(field, event.target.value);
 
@@ -292,36 +243,68 @@ export function ApplicationForm({ applicantName }: ApplicationFormProps) {
             <div className="form-grid">
               <label>
                 Pendapatan bulanan
-                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="1" onChange={setNumeric("monthlyIncome")} placeholder="8.000.000" type="number" value={String(values.monthlyIncome)} /></div>
+                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="1" onChange={setNumeric("monthlyIncome")} required type="number" value={String(values.monthlyIncome)} /></div>
                 {errors.monthlyIncome && <span className="field-error">{errors.monthlyIncome}</span>}
               </label>
               <label>
                 Cicilan / utang bulanan saat ini
-                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="0" onChange={setNumeric("monthlyDebt")} placeholder="1.500.000" type="number" value={String(values.monthlyDebt)} /></div>
+                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="0" onChange={setNumeric("monthlyDebt")} required type="number" value={String(values.monthlyDebt)} /></div>
                 {errors.monthlyDebt && <span className="field-error">{errors.monthlyDebt}</span>}
               </label>
               <label>
                 Lama bekerja
-                <div className="input-suffix"><input max="60" min="0" onChange={setNumeric("employmentYears")} placeholder="3" step="0.5" type="number" value={String(values.employmentYears)} /><span>tahun</span></div>
+                <div className="input-suffix"><input max="60" min="0" onChange={setNumeric("employmentYears")} required step="0.5" type="number" value={String(values.employmentYears)} /><span>tahun</span></div>
                 {errors.employmentYears && <span className="field-error">{errors.employmentYears}</span>}
               </label>
               <label>
                 Riwayat kredit
-                <div className="input-suffix"><input max="60" min="0" onChange={setNumeric("creditHistoryYears")} placeholder="2" step="0.5" type="number" value={String(values.creditHistoryYears)} /><span>tahun</span></div>
+                <div className="input-suffix"><input max="60" min="0" onChange={setNumeric("creditHistoryYears")} required step="0.5" type="number" value={String(values.creditHistoryYears)} /><span>tahun</span></div>
                 {errors.creditHistoryYears && <span className="field-error">{errors.creditHistoryYears}</span>}
               </label>
             </div>
-            <label className="checkbox-field">
-              <input
-                checked={values.recentDefaults === true}
-                onChange={(event) => update("recentDefaults", event.target.checked)}
-                type="checkbox"
-              />
-              <span>
-                <strong>Saya memiliki tunggakan dalam 12 bulan terakhir</strong>
-                <small>Informasi ini hanya digunakan pada simulasi skor.</small>
-              </span>
-            </label>
+            <fieldset
+              aria-describedby={
+                errors.recentDefaults
+                  ? "recent-defaults-hint recent-defaults-error"
+                  : "recent-defaults-hint"
+              }
+              aria-invalid={Boolean(errors.recentDefaults)}
+              className="choice-fieldset"
+            >
+              <legend>Apakah Anda memiliki tunggakan dalam 12 bulan terakhir?</legend>
+              <p className="choice-hint" id="recent-defaults-hint">
+                Pilih salah satu jawaban agar simulasi menggunakan data yang Anda masukkan.
+              </p>
+              <div className="choice-options">
+                <label className="choice-option">
+                  <input
+                    checked={values.recentDefaults === false}
+                    name="recentDefaults"
+                    onChange={() => update("recentDefaults", false)}
+                    required
+                    type="radio"
+                    value="false"
+                  />
+                  <span>Tidak</span>
+                </label>
+                <label className="choice-option">
+                  <input
+                    checked={values.recentDefaults === true}
+                    name="recentDefaults"
+                    onChange={() => update("recentDefaults", true)}
+                    required
+                    type="radio"
+                    value="true"
+                  />
+                  <span>Ya</span>
+                </label>
+              </div>
+              {errors.recentDefaults && (
+                <span className="field-error" id="recent-defaults-error" role="alert">
+                  {errors.recentDefaults}
+                </span>
+              )}
+            </fieldset>
           </section>
 
           <section className="form-section">
@@ -332,12 +315,12 @@ export function ApplicationForm({ applicantName }: ApplicationFormProps) {
             <div className="form-grid">
               <label>
                 Jumlah pinjaman
-                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="1000000" onChange={setNumeric("loanAmount")} placeholder="25.000.000" type="number" value={String(values.loanAmount)} /></div>
+                <div className="input-prefix"><span>Rp</span><input inputMode="numeric" min="1000000" onChange={setNumeric("loanAmount")} required type="number" value={String(values.loanAmount)} /></div>
                 {errors.loanAmount && <span className="field-error">{errors.loanAmount}</span>}
               </label>
               <label>
                 Tenor pinjaman
-                <div className="input-suffix"><input max="60" min="3" onChange={setNumeric("loanTermMonths")} type="number" value={String(values.loanTermMonths)} /><span>bulan</span></div>
+                <div className="input-suffix"><input max="60" min="3" onChange={setNumeric("loanTermMonths")} required type="number" value={String(values.loanTermMonths)} /><span>bulan</span></div>
                 {errors.loanTermMonths && <span className="field-error">{errors.loanTermMonths}</span>}
               </label>
             </div>
@@ -352,58 +335,7 @@ export function ApplicationForm({ applicantName }: ApplicationFormProps) {
           </div>
         </form>
 
-        <aside className="score-preview-card">
-          <div className="preview-heading">
-            <span>PRATINJAU</span><span className="live-dot" /> langsung
-          </div>
-          {preview ? (
-            <>
-              <div className="preview-score">
-                <div><strong>{preview.creditScore}</strong><span>SIMULASI SKOR</span></div>
-                <span className={`risk-pill risk-${previewTier}`}>
-                  {previewTier === "low"
-                    ? "Risiko rendah"
-                    : previewTier === "moderate"
-                      ? "Risiko moderat"
-                      : previewTier === "elevated"
-                        ? "Perlu perhatian"
-                        : "Risiko tinggi"}
-                </span>
-              </div>
-              <div className="score-scale">
-                <span
-                  style={{
-                    width: `${((preview.creditScore - 300) / 550) * 100}%`,
-                  }}
-                />
-                <i
-                  style={{
-                    left: `${((preview.creditScore - 300) / 550) * 100}%`,
-                  }}
-                />
-              </div>
-              <div className="scale-labels"><span>300</span><span>850</span></div>
-              <div className="preview-detail">
-                <div><span>DTI pascapinjaman</span><strong>{(preview.dtiRatio * 100).toFixed(1)}%</strong></div>
-                <div><span>Perkiraan cicilan</span><strong>{currency.format(preview.estimatedPayment)}</strong></div>
-              </div>
-              <div className="preview-info">
-                <strong>Bagaimana skor dihitung?</strong>
-                <p>Skor 300–850 memperhitungkan DTI, pendapatan, stabilitas kerja, riwayat kredit, ukuran pinjaman, dan tunggakan.</p>
-              </div>
-            </>
-          ) : (
-            <div className="preview-empty">
-              <div className="preview-placeholder">···</div>
-              <strong>Skor akan muncul di sini</strong>
-              <p>Lengkapi pendapatan, utang, dan rencana pinjaman untuk melihat pratinjau.</p>
-            </div>
-          )}
-          <p className="preview-disclaimer">
-            <span aria-hidden="true">i</span>
-            Simulasi akademik saja. Bukan penawaran atau keputusan pinjaman.
-          </p>
-        </aside>
+        <ScorePreviewCard preview={preview} />
       </div>
     </main>
   );

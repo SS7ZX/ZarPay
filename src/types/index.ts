@@ -53,11 +53,20 @@ export interface ApplicationRecord {
   score_factors: ScoreFactor[];
   status: ApplicationStatus;
   reviewed_at: string | null;
+  reviewed_by: string | null;
+  review_note: string | null;
   created_at: string;
 }
 
 export interface DashboardApplication extends ApplicationRecord {
   borrower_name: string;
+}
+
+export interface DashboardStats {
+  totalApplications: number;
+  pendingApplications: number;
+  averageCreditScore: number | null;
+  totalLoanValue: string;
 }
 
 export type Json =
@@ -103,6 +112,8 @@ export interface Database {
           score_factors: Json;
           status: ApplicationStatus;
           reviewed_at: string | null;
+          reviewed_by: string | null;
+          review_note: string | null;
           created_at: string;
         };
         Insert: {
@@ -123,11 +134,15 @@ export interface Database {
           score_factors: Json;
           status?: ApplicationStatus;
           reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          review_note?: string | null;
           created_at?: string;
         };
         Update: {
           status?: ApplicationStatus;
           reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          review_note?: string | null;
         };
         Relationships: [];
       };
@@ -137,6 +152,15 @@ export interface Database {
       current_user_role: {
         Args: Record<string, never>;
         Returns: UserRole | null;
+      };
+      dashboard_stats: {
+        Args: Record<string, never>;
+        Returns: {
+          total_applications: number;
+          pending_applications: number;
+          average_credit_score: number | null;
+          total_loan_value: string;
+        }[];
       };
     };
     Enums: {

@@ -5,8 +5,46 @@ export interface ValidationResult {
   errors: Partial<Record<keyof ApplicationInput, string>>;
 }
 
+export interface ReviewDecision {
+  status: "approved" | "declined";
+  reviewNote: string;
+}
+
+export type ReviewDecisionValidation =
+  | { value: ReviewDecision; error: null }
+  | { value: null; error: string };
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
+
+export function validateReviewDecision(
+  value: unknown,
+): ReviewDecisionValidation {
+  if (
+    !isRecord(value) ||
+    (value.status !== "approved" && value.status !== "declined")
+  ) {
+    return { value: null, error: "Status evaluasi tidak valid." };
+  }
+
+  const reviewNote =
+    typeof value.reviewNote === "string" ? value.reviewNote.trim() : "";
+  const reviewNoteLength = Array.from(reviewNote).length;
+  if (reviewNoteLength < 10 || reviewNoteLength > 1000) {
+    return {
+      value: null,
+      error: "Catatan keputusan harus berisi 10 sampai 1000 karakter.",
+    };
+  }
+
+  return {
+    value: {
+      status: value.status,
+      reviewNote,
+    },
+    error: null,
+  };
+}
 
 export function validateApplication(value: unknown): ValidationResult {
   const errors: ValidationResult["errors"] = {};
@@ -54,6 +92,14 @@ export function validateApplication(value: unknown): ValidationResult {
     const [minimum, maximum] = ranges[field];
     if (number < minimum || number > maximum) {
       errors[field] = `Nilai harus antara ${minimum.toLocaleString("id-ID")} dan ${maximum.toLocaleString("id-ID")}.`;
+    }
+    if (
+      (field === "monthlyIncome" ||
+        field === "monthlyDebt" ||
+        field === "loanAmount") &&
+      !Number.isInteger(number)
+    ) {
+      errors[field] = "Nominal Rupiah harus berupa bilangan bulat.";
     }
     if (field === "loanTermMonths" && !Number.isInteger(number)) {
       errors[field] = "Tenor harus berupa bilangan bulat.";

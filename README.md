@@ -9,11 +9,23 @@ ZarPay is an Indonesian-language credit scoring and loan risk assessment applica
 - Borrower and evaluator experiences with role checks on the server.
 - Borrower-only application creation, validated on the server and persisted in PostgreSQL.
 - A transparent 300–850 simulated credit score, estimated monthly payment, post-loan DTI, and risk tier.
-- Evaluator review decisions for pending applications.
+- Evaluator decisions include the reviewing account, timestamp, and required rationale.
 - Row-level security for application and profile reads; application writes use a server-only service role key after authentication and role checks.
-- Responsive dashboard, filtering, application details, and validation/error feedback.
+- Server-paginated dashboard with database-side search and status filtering.
+- Responsive application details, validation/error feedback, and scoring tests.
+- No seeded accounts or application records; the public landing page does not present fabricated applicant results.
 
 The public landing page is `/`. Authenticated users work from `/dashboard`; borrowers can create a new application at `/apply`.
+
+## Project structure
+
+- `app/` contains App Router pages, route handlers, shared layout, and global design tokens.
+- `app/styles/` groups global styles by workspace, authentication/forms, marketing, and responsive behavior.
+- `src/components/marketing/` separates the landing-page shell from its content sections.
+- `src/components/dashboard/` separates dashboard orchestration, the application list, detail/review dialog, and dashboard-specific formatters.
+- `src/components/forms/` separates application state/submission from result and live-preview presentation.
+- `src/lib/` contains scoring, validation, authentication, and Supabase client helpers.
+- `supabase/migrations/` contains the ordered database schema and hardening migrations.
 
 ## Important: academic simulation only
 
@@ -21,7 +33,7 @@ The scoring formula and 12% APR payment estimate are illustrative rules for an a
 
 ## Requirements
 
-- Node.js 20.9 or newer
+- Node.js 22.0 or newer
 - A Supabase project
 
 ## Configure Supabase
@@ -30,9 +42,8 @@ The scoring formula and 12% APR payment estimate are illustrative rules for an a
    - `NEXT_PUBLIC_SUPABASE_URL`: the project URL.
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: the project's publishable key.
    - `SUPABASE_SERVICE_ROLE_KEY`: the server-side service role key. Never expose this key in browser code or commit it.
-   - `NEXT_PUBLIC_SITE_URL`: the canonical app origin, such as `http://localhost:3000` locally or the HTTPS production URL.
-2. In the Supabase SQL Editor, run `supabase/migrations/20261110130000_initial_schema.sql`.
-3. In Supabase Auth URL Configuration, set the Site URL to `NEXT_PUBLIC_SITE_URL` and add `<site-url>/auth/callback` to the redirect allow list.
+2. In the Supabase SQL Editor, run every SQL migration in `supabase/migrations` in filename order. The production-hardening migration stops if existing applications contain fractional Rupiah amounts; reconcile those records explicitly before retrying instead of rounding financial data silently.
+3. In Supabase Auth URL Configuration, set the Site URL to the deployed HTTPS origin and add the exact production origin followed by `/auth/callback` to the redirect allow list. Email confirmation redirects use the origin of the site where registration starts.
 4. Configure email confirmation and production SMTP in Supabase before inviting real users.
 5. Start the app and create an account. New accounts are assigned the `borrower` role by a database trigger.
 6. To promote an evaluator, run this statement in the Supabase SQL Editor, replacing the email with the intended account:
@@ -62,6 +73,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ```bash
 npm run lint
+npm test
 npx tsc --noEmit
 npm run build
 ```
@@ -72,6 +84,6 @@ The production server can be started with `npm run start` after a successful bui
 
 - Add automated unit tests for scoring boundaries and API authorization, plus Supabase RLS integration tests.
 - Enable Supabase Auth protections appropriate for the deployment (rate limits, CAPTCHA or bot protection, MFA for evaluators, secure email delivery, and redirect allow lists).
-- Add monitoring, audit logging for evaluator actions, backup/restore procedures, retention rules, and privacy notices.
+- Add append-only audit events, monitoring, backup/restore procedures, retention and deletion workflows, and privacy notices. The current review fields provide decision provenance, not an immutable event history.
 - Have the score model, DTI methodology, decision criteria, accessibility, and Indonesian legal/compliance obligations independently reviewed.
 - Configure and verify the production domain, HTTPS, CSP/security headers, database backups, and incident response.

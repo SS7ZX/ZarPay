@@ -1,59 +1,38 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import { ApplicationDetailModal } from "@/src/components/dashboard/application-detail-modal";
+import { ApplicationList } from "@/src/components/dashboard/application-list";
 import { BrandLogo } from "@/src/components/common/brand-logo";
 import type {
-  ApplicationRecord,
   ApplicationStatus,
   DashboardApplication,
+  DashboardStats,
   Profile,
-  RiskTier,
   UserRole,
 } from "@/src/types";
+import {
+  currencyFormat,
+  dashboardDateFormat,
+  initials,
+} from "./dashboard-utils";
 
 interface DashboardClientProps {
   profile: Profile;
   email: string;
   applications: DashboardApplication[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  searchQuery: string;
+  statusFilter: "all" | ApplicationStatus;
+  stats: DashboardStats;
 }
 
-const currency = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-  maximumFractionDigits: 0,
-});
-const shortDate = new Intl.DateTimeFormat("id-ID", {
-  day: "numeric",
-  month: "short",
-  year: "numeric",
-});
-
-const statusLabels: Record<ApplicationStatus, string> = {
-  pending: "Menunggu tinjauan",
-  approved: "Disetujui",
-  declined: "Belum disetujui",
-};
-const riskLabels: Record<RiskTier, string> = {
-  low: "Risiko rendah",
-  moderate: "Risiko moderat",
-  elevated: "Perlu perhatian",
-  high: "Risiko tinggi",
-};
-
-function initials(name: string): string {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toLocaleUpperCase("id-ID"))
-    .join("");
-}
-
-async function responseError(response: Response): Promise<string> {
-  const payload: unknown = await response.json().catch(() => null);
+function responseError(payload: unknown): string {
   if (
     typeof payload === "object" &&
     payload !== null &&
@@ -65,91 +44,97 @@ async function responseError(response: Response): Promise<string> {
   return "Permintaan gagal. Silakan coba kembali.";
 }
 
-function ScoreBadge({ score }: { score: number }) {
-  return (
-    <span className="score-badge" aria-label={`Skor kredit ${score}`}>
-      {score}
-    </span>
-  );
+function parseReviewResult(
+  payload: unknown,
+): Pick<
+  DashboardApplication,
+  "id" | "status" | "reviewed_at" | "reviewed_by" | "review_note"
+> | null {
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("application" in payload) ||
+    typeof payload.application !== "object" ||
+    payload.application === null
+  ) {
+    return null;
+  }
+  const application = payload.application;
+  if (
+    !("id" in application) ||
+    !("status" in application) ||
+    !("reviewed_at" in application) ||
+    !("reviewed_by" in application) ||
+    !("review_note" in application) ||
+    typeof application.id !== "string" ||
+    (application.status !== "approved" && application.status !== "declined") ||
+    typeof application.reviewed_at !== "string" ||
+    typeof application.reviewed_by !== "string" ||
+    typeof application.review_note !== "string"
+  ) {
+    return null;
+  }
+  return {
+    id: application.id,
+    status: application.status,
+    reviewed_at: application.reviewed_at,
+    reviewed_by: application.reviewed_by,
+    review_note: application.review_note,
+  };
 }
 
 export function DashboardClient({
   profile,
   email,
-  applications: initialApplications,
+  applications,
+  page,
+  pageSize,
+  totalCount,
+  searchQuery,
+  statusFilter,
+  stats,
 }: DashboardClientProps) {
   const router = useRouter();
-  const [applications, setApplications] = useState(initialApplications);
   const [selected, setSelected] = useState<DashboardApplication | null>(null);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | ApplicationStatus>(
-    "all",
-  );
+  const [reviewNote, setReviewNote] = useState("");
+  const [reviewNoteError, setReviewNoteError] = useState("");
   const [actionError, setActionError] = useState("");
   const [busyId, setBusyId] = useState("");
   const [signingOut, setSigningOut] = useState(false);
   const role: UserRole = profile.role;
   const evaluator = role === "evaluator";
-
-  const filteredApplications = useMemo(() => {
-    const query = search.trim().toLocaleLowerCase("id-ID");
-    return applications.filter((application) => {
-      const matchesSearch =
-        !query ||
-        application.applicant_name.toLocaleLowerCase("id-ID").includes(query) ||
-        application.id.toLocaleLowerCase("id-ID").includes(query);
-      return (
-        matchesSearch &&
-        (statusFilter === "all" || application.status === statusFilter)
-      );
-    });
-  }, [applications, search, statusFilter]);
-
-  const pendingCount = applications.filter(
-    (application) => application.status === "pending",
-  ).length;
-  const averageScore = applications.length
-    ? Math.round(
-        applications.reduce(
-          (total, application) => total + application.credit_score,
-          0,
-        ) / applications.length,
-      )
-    : 0;
-  const totalLoanValue = applications.reduce(
-    (total, application) => total + application.loan_amount,
-    0,
-  );
+  const pendingCount = stats.pendingApplications;
 
   async function reviewApplication(
     application: DashboardApplication,
     status: "approved" | "declined",
   ) {
     setActionError("");
+    const note = reviewNote.trim();
+    const noteLength = Array.from(note).length;
+    if (noteLength < 10 || noteLength > 1000) {
+      setReviewNoteError("Catatan keputusan harus berisi 10 sampai 1000 karakter.");
+      return;
+    }
+    setReviewNoteError("");
     setBusyId(application.id);
     try {
       const response = await fetch(`/api/applications/${application.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status, reviewNote: note }),
       });
-      if (!response.ok) throw new Error(await responseError(response));
-
-      const updated: ApplicationRecord = {
-        ...application,
-        status,
-        reviewed_at: new Date().toISOString(),
-      };
-      setApplications((current) =>
-        current.map((item) =>
-          item.id === application.id
-            ? { ...item, ...updated }
-            : item,
-        ),
-      );
+      const payload: unknown = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(responseError(payload));
+      const result = parseReviewResult(payload);
+      if (!result || result.id !== application.id) {
+        throw new Error("Respons keputusan tidak valid. Muat ulang dashboard.");
+      }
+      const updated = { ...application, ...result };
       setSelected((current) =>
         current?.id === application.id ? { ...current, ...updated } : current,
       );
+      router.refresh();
     } catch (error) {
       setActionError(
         error instanceof Error ? error.message : "Keputusan gagal disimpan.",
@@ -161,14 +146,20 @@ export function DashboardClient({
 
   async function signOut() {
     setSigningOut(true);
-    const { error } = await createClient().auth.signOut({ scope: "local" });
-    if (error) {
+    setActionError("");
+    try {
+      const { error } = await createClient().auth.signOut({ scope: "local" });
+      if (error) throw error;
+      router.replace("/login");
+      router.refresh();
+    } catch (error) {
+      console.error(
+        "Failed to sign out:",
+        error instanceof Error ? error.message : error,
+      );
       setActionError("Keluar gagal. Silakan coba kembali.");
       setSigningOut(false);
-      return;
     }
-    router.replace("/login");
-    router.refresh();
   }
 
   return (
@@ -230,7 +221,7 @@ export function DashboardClient({
           <div>
             <p className="breadcrumb">Workspace <span>/</span> Ringkasan</p>
             <p className="topbar-date">
-              {shortDate.format(new Date())}
+              {dashboardDateFormat.format(new Date())}
             </p>
           </div>
           <div className="topbar-actions">
@@ -266,7 +257,7 @@ export function DashboardClient({
           </div>
         </section>
 
-        {actionError && (
+        {actionError && !selected && (
           <p className="alert alert-error" role="alert">{actionError}</p>
         )}
 
@@ -276,7 +267,7 @@ export function DashboardClient({
               <span>Total pengajuan</span>
               <span className="stat-icon">▤</span>
             </div>
-            <strong>{applications.length}</strong>
+            <strong>{stats.totalApplications}</strong>
             <span className="stat-foot">
               {evaluator ? "Seluruh pengajuan terdaftar" : "Pengajuan Anda"}
             </span>
@@ -296,7 +287,7 @@ export function DashboardClient({
               <span>Rata-rata skor</span>
               <span className="stat-icon stat-icon-green">↗</span>
             </div>
-            <strong>{averageScore || "—"}</strong>
+            <strong>{stats.averageCreditScore ?? "—"}</strong>
             <span className="stat-foot">Rentang simulasi 300–850</span>
           </article>
           <article className="stat-card">
@@ -305,118 +296,27 @@ export function DashboardClient({
               <span className="stat-icon stat-icon-purple">◈</span>
             </div>
             <strong className="stat-currency">
-              {currency.format(totalLoanValue)}
+              {currencyFormat.format(BigInt(stats.totalLoanValue))}
             </strong>
             <span className="stat-foot">Nilai pengajuan terkumpul</span>
           </article>
         </section>
 
-        <section className="content-card" id="applications">
-          <div className="section-heading">
-            <div>
-              <h2>{evaluator ? "Pengajuan untuk ditinjau" : "Riwayat pengajuan"}</h2>
-              <p>
-                {evaluator
-                  ? "Buka detail untuk melihat faktor skor dan memberi keputusan."
-                  : "Pilih pengajuan untuk melihat rincian skor dan status."}
-              </p>
-            </div>
-            <div className="table-controls">
-              <label className="search-field">
-                <span aria-hidden="true">⌕</span>
-                <input
-                  aria-label="Cari pengajuan"
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Cari nama atau ID"
-                  value={search}
-                />
-              </label>
-              <select
-                aria-label="Filter status"
-                onChange={(event) =>
-                  setStatusFilter(event.target.value as "all" | ApplicationStatus)
-                }
-                value={statusFilter}
-              >
-                <option value="all">Semua status</option>
-                <option value="pending">Menunggu</option>
-                <option value="approved">Disetujui</option>
-                <option value="declined">Belum disetujui</option>
-              </select>
-            </div>
-          </div>
-
-          {filteredApplications.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-illustration">Z</div>
-              <h3>{applications.length ? "Tidak ada hasil" : "Belum ada pengajuan"}</h3>
-              <p>
-                {applications.length
-                  ? "Coba ubah kata pencarian atau filter status."
-                  : evaluator
-                    ? "Pengajuan baru akan muncul di sini."
-                    : "Mulai dengan mengisi profil pinjaman Anda."}
-              </p>
-              {!evaluator && applications.length === 0 && (
-                <Link className="button button-primary" href="/apply">
-                  Buat pengajuan pertama
-                </Link>
-              )}
-            </div>
-          ) : (
-            <div className="table-wrap">
-              <table className="application-table">
-                <thead>
-                  <tr>
-                    <th>Peminjam</th>
-                    <th>Jumlah pinjaman</th>
-                    <th>Skor kredit</th>
-                    <th>Rasio DTI</th>
-                    <th>Status</th>
-                    <th>Tanggal</th>
-                    <th><span className="sr-only">Detail</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredApplications.map((application) => (
-                    <tr key={application.id}>
-                      <td>
-                        <div className="applicant-cell">
-                          <span className="avatar avatar-small">
-                            {initials(application.applicant_name)}
-                          </span>
-                          <span>
-                            <strong>{application.applicant_name}</strong>
-                            <small>#{application.id.slice(0, 8).toUpperCase()}</small>
-                          </span>
-                        </div>
-                      </td>
-                      <td>{currency.format(application.loan_amount)}</td>
-                      <td><ScoreBadge score={application.credit_score} /></td>
-                      <td>{(application.dti_ratio * 100).toFixed(1)}%</td>
-                      <td>
-                        <span className={`status-pill status-${application.status}`}>
-                          <span className="status-dot" />
-                          {statusLabels[application.status]}
-                        </span>
-                      </td>
-                      <td>{shortDate.format(new Date(application.created_at))}</td>
-                      <td>
-                        <button
-                          className="table-link"
-                          onClick={() => setSelected(application)}
-                          type="button"
-                        >
-                          Detail <span aria-hidden="true">→</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+        <ApplicationList
+          applications={applications}
+          evaluator={evaluator}
+          onSelect={(application) => {
+            setSelected(application);
+            setReviewNote("");
+            setReviewNoteError("");
+          }}
+          page={page}
+          pageSize={pageSize}
+          searchQuery={searchQuery}
+          statusFilter={statusFilter}
+          totalApplications={stats.totalApplications}
+          totalCount={totalCount}
+        />
         <footer className="page-footer">
           <span>ZarPay © {new Date().getFullYear()}</span>
           <span>Penilaian berbasis aturan simulasi</span>
@@ -424,97 +324,20 @@ export function DashboardClient({
       </main>
 
       {selected && (
-        <div className="modal-backdrop" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setSelected(null);
-        }}>
-          <section
-            aria-labelledby="detail-title"
-            aria-modal="true"
-            className="detail-modal"
-            role="dialog"
-          >
-            <div className="modal-heading">
-              <div>
-                <p className="eyebrow">RINCIAN PENILAIAN</p>
-                <h2 id="detail-title">{selected.applicant_name}</h2>
-                <span className="modal-reference">
-                  ID #{selected.id.slice(0, 8).toUpperCase()}
-                </span>
-              </div>
-              <button
-                className="icon-button modal-close"
-                onClick={() => setSelected(null)}
-                aria-label="Tutup detail"
-                type="button"
-              >
-                ×
-              </button>
-            </div>
-            <div className="score-summary">
-              <div className="score-ring">
-                <strong>{selected.credit_score}</strong>
-                <span>SKOR</span>
-              </div>
-              <div>
-                <span className={`risk-pill risk-${selected.risk_tier}`}>
-                  {riskLabels[selected.risk_tier]}
-                </span>
-                <p>Rentang penilaian ZarPay: 300–850</p>
-              </div>
-            </div>
-            <div className="detail-metrics">
-              <div><span>Pinjaman</span><strong>{currency.format(selected.loan_amount)}</strong></div>
-              <div><span>Estimasi cicilan / bln</span><strong>{currency.format(selected.estimated_payment)}</strong></div>
-              <div><span>DTI pascapinjaman</span><strong>{(selected.dti_ratio * 100).toFixed(1)}%</strong></div>
-              <div><span>Tenor</span><strong>{selected.loan_term_months} bulan</strong></div>
-            </div>
-            <div className="factor-heading">
-              <h3>Faktor pembentuk skor</h3>
-              <span>Simulasi berbasis aturan</span>
-            </div>
-            <ul className="factor-list">
-              {selected.score_factors.map((factor) => (
-                <li key={factor.label}>
-                  <span className="factor-check" aria-hidden="true">✓</span>
-                  <span className="factor-copy">
-                    <strong>{factor.label}</strong>
-                    <small>{factor.explanation}</small>
-                  </span>
-                  <span className="factor-points">{factor.points}<small>/{factor.maximum}</small></span>
-                </li>
-              ))}
-            </ul>
-            <div className="modal-footer">
-              <span className={`status-pill status-${selected.status}`}>
-                <span className="status-dot" /> {statusLabels[selected.status]}
-              </span>
-              {evaluator && selected.status === "pending" && (
-                <div className="review-actions">
-                  <button
-                    className="button button-quiet"
-                    disabled={busyId === selected.id}
-                    onClick={() => reviewApplication(selected, "declined")}
-                    type="button"
-                  >
-                    Tidak disetujui
-                  </button>
-                  <button
-                    className="button button-primary"
-                    disabled={busyId === selected.id}
-                    onClick={() => reviewApplication(selected, "approved")}
-                    type="button"
-                  >
-                    {busyId === selected.id ? "Menyimpan..." : "Setujui"}
-                  </button>
-                </div>
-              )}
-            </div>
-            <p className="disclaimer">
-              Hasil ini merupakan simulasi untuk keperluan akademik. Keputusan
-              tidak menggantikan pemeriksaan kredit atau nasihat keuangan.
-            </p>
-          </section>
-        </div>
+        <ApplicationDetailModal
+          actionError={actionError}
+          application={selected}
+          busy={busyId === selected.id}
+          evaluator={evaluator}
+          onClose={() => setSelected(null)}
+          onReview={(status) => reviewApplication(selected, status)}
+          onReviewNoteChange={(value) => {
+            setReviewNote(value);
+            setReviewNoteError("");
+          }}
+          reviewNote={reviewNote}
+          reviewNoteError={reviewNoteError}
+        />
       )}
     </div>
   );

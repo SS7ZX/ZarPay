@@ -4,6 +4,7 @@ import {
   getServiceRoleKey,
   getSupabaseEnvironment,
 } from "@/src/lib/supabase/env";
+import { validateReviewDecision } from "@/src/lib/validators";
 import { createAdminClient } from "@/src/lib/supabase/admin";
 import { createClient } from "@/src/lib/supabase/server";
 
@@ -30,14 +31,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   } catch {
     return jsonError("Isi permintaan bukan JSON yang valid.", 400);
   }
-  if (
-    typeof body !== "object" ||
-    body === null ||
-    !("status" in body) ||
-    (body.status !== "approved" && body.status !== "declined")
-  ) {
-    return jsonError("Status evaluasi tidak valid.", 422);
-  }
+  const validation = validateReviewDecision(body);
+  if (!validation.value) return jsonError(validation.error, 422);
 
   const supabase = await createClient();
   const {
@@ -62,10 +57,15 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   const admin = createAdminClient();
   const { data: application, error } = await admin
     .from("applications")
-    .update({ status: body.status, reviewed_at: new Date().toISOString() })
+    .update({
+      status: validation.value.status,
+      reviewed_at: new Date().toISOString(),
+      reviewed_by: user.id,
+      review_note: validation.value.reviewNote,
+    })
     .eq("id", id)
     .eq("status", "pending")
-    .select("id, status, reviewed_at")
+    .select("id, status, reviewed_at, reviewed_by, review_note")
     .maybeSingle();
 
   if (error) {
