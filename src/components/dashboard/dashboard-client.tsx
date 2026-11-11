@@ -121,6 +121,35 @@ export function DashboardClient({
     0,
   );
 
+
+// Distribusi kategori risiko kredit
+const riskDistribution: {
+  tier: RiskTier;
+  label: string;
+  count: number;
+  percent: number;
+}[] = (
+  [
+    { tier: "low", label: "Risiko rendah" },
+    { tier: "moderate", label: "Risiko moderat" },
+    { tier: "elevated", label: "Perlu perhatian" },
+    { tier: "high", label: "Risiko tinggi" },
+  ] as const
+).map(({ tier, label }) => {
+  const count = applications.filter(
+    (application) => application.risk_tier === tier,
+  ).length;
+
+  return {
+    tier,
+    label,
+    count,
+    percent: applications.length
+      ? (count / applications.length) * 100
+      : 0,
+  };
+});
+
   async function reviewApplication(
     application: DashboardApplication,
     status: "approved" | "declined",
@@ -309,6 +338,121 @@ export function DashboardClient({
             </strong>
             <span className="stat-foot">Nilai pengajuan terkumpul</span>
           </article>
+        </section>
+
+
+        {/* DISTRIBUSI RISIKO KREDIT */}
+        <section className="dashboard-insights">
+          <div className="insight-card">
+            <div className="insight-heading">
+              <div>
+                <p className="eyebrow">ANALISIS PORTOFOLIO</p>
+                <h2>Distribusi profil risiko</h2>
+                <p>
+                  Gambaran kategori risiko dari seluruh pengajuan.
+                </p>
+              </div>
+              <span className="insight-icon">◈</span>
+            </div>
+
+            <div className="risk-distribution">
+              {riskDistribution.map((item) => (
+                <div className="risk-item" key={item.tier}>
+                  <div className="risk-item-heading">
+                    <span className={`risk-label risk-label-${item.tier}`}>
+                      <span className="risk-indicator" />
+                      {item.label}
+                    </span>
+                    <strong>
+                      {item.count}
+                      <small>
+                        {" "}({item.percent.toFixed(0)}%)
+                      </small>
+                    </strong>
+                  </div>
+
+                  <div
+                    className="risk-track"
+                    role="progressbar"
+                    aria-label={`Persentase ${item.label}`}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={Math.round(item.percent)}
+                  >
+                    <div
+                      className={`risk-fill risk-fill-${item.tier}`}
+                      style={{ width: `${item.percent}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="insight-note">
+              <span>ⓘ</span>
+              Kategori risiko dihitung berdasarkan hasil simulasi
+              penilaian kredit ZarPay.
+            </p>
+          </div>
+
+          <div className="insight-card insight-summary">
+            <div className="insight-heading">
+              <div>
+                <p className="eyebrow">RINGKASAN AKTIVITAS</p>
+                <h2>Status pengajuan</h2>
+                <p>Ringkasan perkembangan pengajuan.</p>
+              </div>
+              <span className="insight-icon">▤</span>
+            </div>
+
+            <div className="activity-list">
+              <div className="activity-item">
+                <span className="activity-symbol activity-pending">
+                  ◷
+                </span>
+                <div>
+                  <strong>Menunggu tinjauan</strong>
+                  <small>Masih dalam proses evaluasi</small>
+                </div>
+                <strong>{pendingCount}</strong>
+              </div>
+
+              <div className="activity-item">
+                <span className="activity-symbol activity-approved">
+                  ✓
+                </span>
+                <div>
+                  <strong>Disetujui</strong>
+                  <small>Pengajuan telah disetujui</small>
+                </div>
+                <strong>
+                  {applications.filter(
+                    (item) => item.status === "approved",
+                  ).length}
+                </strong>
+              </div>
+
+              <div className="activity-item">
+                <span className="activity-symbol activity-declined">
+                  ×
+                </span>
+                <div>
+                  <strong>Belum disetujui</strong>
+                  <small>Pengajuan tidak disetujui</small>
+                </div>
+                <strong>
+                  {applications.filter(
+                    (item) => item.status === "declined",
+                  ).length}
+                </strong>
+              </div>
+            </div>
+
+            <div className="activity-total">
+              <span>Total seluruh pengajuan</span>
+              <strong>{applications.length}</strong>
+            </div>
+          </div>
         </section>
 
         <section className="content-card" id="applications">

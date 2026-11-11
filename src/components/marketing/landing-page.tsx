@@ -102,7 +102,20 @@ const scoreTiers = [
 
 export function LandingPage() {
   return (
-    <main className="landing-page">
+    <main className="landing-page" id="top">
+      <aside className="landing-side-rail" aria-label="Navigasi cepat halaman">
+        <a className="side-rail-brand" href="#top" aria-label="Kembali ke bagian atas">Z</a>
+        <span className="side-rail-line" aria-hidden="true" />
+        <nav>
+          <a href="#top" aria-label="Beranda" title="Beranda"><span>01</span></a>
+          <a href="#fitur" aria-label="Fitur" title="Fitur"><span>02</span></a>
+          <a href="#cara-kerja" aria-label="Cara kerja" title="Cara kerja"><span>03</span></a>
+          <a href="#penilaian" aria-label="Skala penilaian" title="Skala penilaian"><span>04</span></a>
+          <a href="#faq" aria-label="Pertanyaan umum" title="Pertanyaan umum"><span>05</span></a>
+        </nav>
+        <a className="side-rail-top" href="#top" aria-label="Kembali ke atas" title="Kembali ke atas">↑</a>
+      </aside>
+
       <header className="landing-header">
         <div className="landing-container landing-nav">
           <Link className="brand-lockup" href="/" aria-label="ZarPay beranda">
@@ -351,56 +364,78 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-section faq-section" id="faq">
-        <div className="landing-container faq-layout">
-          <div className="section-intro">
-            <span className="landing-eyebrow">Pertanyaan umum</span>
-            <h2>Informasi sebelum Anda mulai</h2>
-            <p>Ketahui batasan perhitungan dan pengelolaan akses.</p>
-          </div>
-          <div className="faq-list">
-            <details>
-              <summary>Apakah skor ini digunakan oleh bank atau biro kredit?</summary>
-              <p>
-                Tidak. Skor dihitung dari aturan simulasi di aplikasi ini dan
-                tidak terhubung ke bank atau biro kredit.
-              </p>
-            </details>
-            <details>
-              <summary>Apakah hasilnya menjamin pinjaman disetujui?</summary>
-              <p>
-                Tidak. Hasilnya bukan persetujuan, penawaran, atau rekomendasi
-                keuangan. Keputusan pinjaman nyata ditentukan oleh pemberi
-                pinjaman melalui proses mereka sendiri.
-              </p>
-            </details>
-            <details>
-              <summary>Bagaimana cicilan dan DTI dihitung?</summary>
-              <p>
-                Estimasi cicilan memakai asumsi bunga tahunan 12% dengan
-                angsuran bulanan tetap. DTI membandingkan kewajiban bulanan,
-                termasuk estimasi cicilan, dengan pendapatan bulanan. Biaya lain
-                tidak termasuk.
-              </p>
-            </details>
-            <details>
-              <summary>Siapa yang dapat melihat pengajuan saya?</summary>
-              <p>
-                Peminjam dapat melihat pengajuannya sendiri. Evaluator hanya
-                mendapat akses setelah administrator mengaktifkan perannya.
-              </p>
-            </details>
-            <details>
-              <summary>Bagaimana data yang saya masukkan digunakan?</summary>
-              <p>
-                Pengajuan disimpan dalam database aplikasi agar hasil dan
-                statusnya dapat ditampilkan. Untuk proyek akademik ini, gunakan
-                data contoh dan hindari informasi keuangan atau identitas pribadi.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
+      
+<section className="landing-section faq-section" id="faq">
+  <div className="landing-container faq-layout">
+    <div className="section-intro">
+      <span className="landing-eyebrow">Pertanyaan umum</span>
+      <h2>Informasi sebelum Anda mulai</h2>
+      <p>Ketahui batasan perhitungan dan pengelolaan akses.</p>
+    </div>
+
+    <div className="faq-list">
+
+      <details name="zarpay-faq">
+        <summary>
+          Apakah skor ini digunakan oleh bank atau biro kredit?
+        </summary>
+        <p>
+          Tidak. Skor dihitung dari aturan simulasi di aplikasi ini
+          dan tidak terhubung ke bank atau biro kredit.
+        </p>
+      </details>
+
+      <details name="zarpay-faq">
+        <summary>
+          Apakah hasilnya menjamin pinjaman disetujui?
+        </summary>
+        <p>
+          Tidak. Hasilnya bukan persetujuan, penawaran, atau
+          rekomendasi keuangan. Keputusan pinjaman tetap ditentukan
+          oleh pemberi pinjaman melalui proses mereka sendiri.
+        </p>
+      </details>
+
+      <details name="zarpay-faq">
+        <summary>
+          Bagaimana cicilan dan DTI dihitung?
+        </summary>
+        <p>
+          Estimasi cicilan memakai asumsi bunga tahunan 12%
+          dengan angsuran bulanan tetap. DTI membandingkan
+          kewajiban bulanan, termasuk estimasi cicilan, dengan
+          pendapatan bulanan. Pengeluaran lain yang tidak
+          dimasukkan tidak termasuk dalam perhitungan.
+        </p>
+      </details>
+
+      <details name="zarpay-faq">
+        <summary>
+          Siapa yang dapat melihat pengajuan saya?
+        </summary>
+        <p>
+          Peminjam dapat melihat pengajuannya sendiri. Evaluator
+          mendapat akses setelah administrator mengaktifkan
+          perannya.
+        </p>
+      </details>
+
+      <details name="zarpay-faq">
+        <summary>
+          Bagaimana data yang saya masukkan digunakan?
+        </summary>
+        <p>
+          Pengajuan disimpan dalam database aplikasi agar hasil
+          dan statusnya dapat ditampilkan. Untuk proyek akademik
+          ini, gunakan data contoh dan hindari informasi keuangan
+          atau identitas pribadi yang sensitif.
+        </p>
+      </details>
+
+    </div>
+  </div>
+</section>
+
 
       <section className="landing-cta-section">
         <div className="landing-container landing-cta">
@@ -430,10 +465,16 @@ export function LandingPage() {
           </div>
         </div>
         <div className="landing-container footer-bottom">
-          <span>© ZarPay</span>
-          <span>Hasil simulasi bukan keputusan pinjaman.</span>
-        </div>
-      </footer>
-    </main>
+  <span>© ZarPay</span>
+
+  <span>Hasil simulasi bukan keputusan pinjaman.</span>
+
+  <a href="#top" className="footer-back-top">
+    Kembali ke atas ↑
+  </a>
+</div>
+    </footer>
+  </main>
   );
 }
+
