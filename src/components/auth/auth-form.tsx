@@ -7,10 +7,14 @@ import { createClient } from "@/src/lib/supabase/client";
 import { BrandLogo } from "@/src/components/common/brand-logo";
 
 interface AuthFormProps {
+  evaluatorMode?: boolean;
   initialError?: string;
 }
 
-export function AuthForm({ initialError = "" }: AuthFormProps) {
+export function AuthForm({
+  evaluatorMode = false,
+  initialError = "",
+}: AuthFormProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [name, setName] = useState("");
@@ -43,11 +47,60 @@ export function AuthForm({ initialError = "" }: AuthFormProps) {
           return;
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
         if (error) throw error;
+
+        if (evaluatorMode) {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", data.user.id)
+            .maybeSingle();
+
+          if (profileError) {
+            console.error(
+              "Failed to verify evaluator sign-in:",
+              profileError.code,
+              profileError.message,
+            );
+            const { error: signOutError } = await supabase.auth.signOut({
+              scope: "local",
+            });
+            if (signOutError) {
+              console.error(
+                "Failed to clear unverified evaluator session:",
+                signOutError.message,
+              );
+            }
+            setErrorMessage(
+              signOutError
+                ? "Akses evaluator tidak dapat diverifikasi. Keluar dari akun dan coba kembali."
+                : "Akses evaluator tidak dapat diverifikasi. Coba kembali.",
+            );
+            return;
+          }
+
+          if (profile?.role !== "evaluator") {
+            const { error: signOutError } = await supabase.auth.signOut({
+              scope: "local",
+            });
+            if (signOutError) {
+              console.error(
+                "Failed to clear non-evaluator session:",
+                signOutError.message,
+              );
+            }
+            setErrorMessage(
+              signOutError
+                ? "Akun ini tidak memiliki akses evaluator. Keluar dari akun lalu hubungi administrator."
+                : "Akun ini belum memiliki akses evaluator. Hubungi administrator project.",
+            );
+            return;
+          }
+        }
       }
 
       router.replace("/dashboard");
@@ -96,12 +149,22 @@ export function AuthForm({ initialError = "" }: AuthFormProps) {
           <span aria-hidden="true">←</span> Kembali ke beranda
         </Link>
         <div className="auth-card">
-          <p className="eyebrow">AKUN ZARPAY</p>
-          <h1>{mode === "signin" ? "Selamat datang kembali" : "Buat akun ZarPay"}</h1>
+          <p className="eyebrow">
+            {evaluatorMode ? "AKSES EVALUATOR" : "AKUN ZARPAY"}
+          </p>
+          <h1>
+            {evaluatorMode
+              ? "Masuk ke panel evaluator"
+              : mode === "signin"
+                ? "Selamat datang kembali"
+                : "Buat akun ZarPay"}
+          </h1>
           <p className="muted-copy">
-            {mode === "signin"
-              ? "Masuk untuk mengelola pengajuan dan melihat penilaian risiko."
-              : "Daftar sebagai peminjam untuk mengajukan simulasi penilaian kredit."}
+            {evaluatorMode
+              ? "Gunakan akun yang telah diberi peran evaluator oleh administrator project."
+              : mode === "signin"
+                ? "Masuk untuk mengelola pengajuan dan melihat penilaian risiko."
+                : "Daftar sebagai peminjam untuk mengajukan simulasi penilaian kredit."}
           </p>
 
           <form className="form-stack" onSubmit={submit}>
@@ -161,19 +224,30 @@ export function AuthForm({ initialError = "" }: AuthFormProps) {
             </button>
           </form>
 
+          {!evaluatorMode && (
+            <p className="auth-switch">
+              {mode === "signin" ? "Belum memiliki akun?" : "Sudah memiliki akun?"}{" "}
+              <button
+                className="text-button"
+                onClick={() => {
+                  setMode(mode === "signin" ? "signup" : "signin");
+                  setErrorMessage("");
+                  setNotice("");
+                }}
+                type="button"
+              >
+                {mode === "signin" ? "Daftar" : "Masuk"}
+              </button>
+            </p>
+          )}
           <p className="auth-switch">
-            {mode === "signin" ? "Belum memiliki akun?" : "Sudah memiliki akun?"}{" "}
-            <button
+            {evaluatorMode ? "Peminjam?" : "Evaluator?"}{" "}
+            <Link
               className="text-button"
-              onClick={() => {
-                setMode(mode === "signin" ? "signup" : "signin");
-                setErrorMessage("");
-                setNotice("");
-              }}
-              type="button"
+              href={evaluatorMode ? "/login" : "/evaluator/login"}
             >
-              {mode === "signin" ? "Daftar" : "Masuk"}
-            </button>
+              {evaluatorMode ? "Masuk sebagai peminjam" : "Masuk ke panel evaluator"}
+            </Link>
           </p>
           <p className="security-note">
             Data akun diamankan oleh Supabase Auth. Peran evaluator hanya dapat

@@ -1,5 +1,7 @@
+import { randomUUID } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSameOriginRequest, jsonError } from "@/src/lib/http";
+import { getApplicationReviewErrorMessage } from "@/src/lib/application-save-error";
 import {
   getServiceRoleKey,
   getSupabaseEnvironment,
@@ -16,7 +18,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!isSameOriginRequest(request)) {
     return jsonError("Permintaan lintas origin tidak diizinkan.", 403);
   }
-  if (!getSupabaseEnvironment() || !getServiceRoleKey()) {
+  if (!getSupabaseEnvironment()) {
     return jsonError("Konfigurasi server Supabase belum lengkap.", 503);
   }
 
@@ -53,6 +55,12 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   if (profile?.role !== "evaluator") {
     return jsonError("Hanya evaluator yang dapat memperbarui keputusan.", 403);
   }
+  if (!getServiceRoleKey()) {
+    return jsonError(
+      "SUPABASE_SERVICE_ROLE_KEY harus berisi service-role atau secret key dari project yang sama.",
+      503,
+    );
+  }
 
   const admin = createAdminClient();
   const { data: application, error } = await admin
@@ -69,8 +77,19 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     .maybeSingle();
 
   if (error) {
-    console.error("Failed to update application review:", error.message);
-    return jsonError("Keputusan gagal disimpan.", 500);
+    const reference = randomUUID();
+    console.error("Failed to update application review:", {
+      reference,
+      code: error.code,
+      message: error.message,
+    });
+    return NextResponse.json(
+      {
+        error: `${getApplicationReviewErrorMessage(error.code)} Kode referensi: ${reference}.`,
+        reference,
+      },
+      { status: 500 },
+    );
   }
   if (!application) {
     return jsonError("Pengajuan tidak ditemukan atau sudah ditinjau.", 404);

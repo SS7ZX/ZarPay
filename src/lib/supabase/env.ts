@@ -40,7 +40,32 @@ export function getSupabaseEnvironment(): SupabaseEnvironment | null {
 
 export function getServiceRoleKey(): string | null {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  return serviceRoleKey && !serviceRoleKey.startsWith("your-")
-    ? serviceRoleKey
-    : null;
+  if (!serviceRoleKey || serviceRoleKey.startsWith("your-")) return null;
+  if (serviceRoleKey.startsWith("sb_secret_")) return serviceRoleKey;
+
+  const parts = serviceRoleKey.split(".");
+  if (parts.length !== 3 || !parts[1]) return null;
+
+  try {
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const paddedPayload = payload.padEnd(
+      payload.length + ((4 - (payload.length % 4)) % 4),
+      "=",
+    );
+    const bytes = Uint8Array.from(atob(paddedPayload), (character) =>
+      character.charCodeAt(0),
+    );
+    const claims: unknown = JSON.parse(new TextDecoder().decode(bytes));
+    if (
+      typeof claims === "object" &&
+      claims !== null &&
+      "role" in claims &&
+      claims.role === "service_role"
+    ) {
+      return serviceRoleKey;
+    }
+  } catch {
+    return null;
+  }
+  return null;
 }

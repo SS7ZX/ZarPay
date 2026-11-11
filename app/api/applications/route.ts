@@ -15,8 +15,14 @@ export async function POST(request: NextRequest) {
   if (!isSameOriginRequest(request)) {
     return jsonError("Permintaan lintas origin tidak diizinkan.", 403);
   }
-  if (!getSupabaseEnvironment() || !getServiceRoleKey()) {
+  if (!getSupabaseEnvironment()) {
     return jsonError("Konfigurasi server Supabase belum lengkap.", 503);
+  }
+  if (!getServiceRoleKey()) {
+    return jsonError(
+      "SUPABASE_SERVICE_ROLE_KEY harus berisi service-role atau secret key dari project yang sama.",
+      503,
+    );
   }
 
   let body: unknown;

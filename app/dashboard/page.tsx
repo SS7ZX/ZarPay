@@ -75,7 +75,11 @@ async function AuthenticatedDashboard({ searchParams }: DashboardPageProps) {
   const { supabase, profile, email } = authenticated;
   const params = await searchParams;
   const searchQuery = (firstValue(params.q) ?? "").trim().slice(0, 100);
-  const statusFilter = parseStatus(firstValue(params.status));
+  const requestedStatus = firstValue(params.status);
+  const statusFilter =
+    requestedStatus === undefined && profile.role === "evaluator"
+      ? "pending"
+      : parseStatus(requestedStatus);
   const requestedPage = parsePage(firstValue(params.page));
 
   if (!supabase) {

@@ -259,6 +259,9 @@ export function LandingSections() {
                 diaktifkan oleh administrator.
               </p>
               <p className="audience-access-note">Tidak tersedia melalui pendaftaran mandiri.</p>
+              <Link className="text-link" href="/evaluator/login">
+                Masuk ke panel evaluator <span aria-hidden="true">→</span>
+              </Link>
             </article>
           </div>
         </div>
@@ -338,7 +341,7 @@ export function LandingSections() {
           </div>
           <div className="footer-links">
             <div><strong>Jelajahi</strong><a href="#fitur">Fitur</a><a href="#cara-kerja">Cara kerja</a><a href="#penilaian">Metode penilaian</a></div>
-            <div><strong>Akun</strong><Link href="/login">Masuk atau daftar</Link><Link href="/dashboard">Dashboard</Link></div>
+            <div><strong>Akun</strong><Link href="/login">Masuk atau daftar</Link><Link href="/evaluator/login">Masuk evaluator</Link><Link href="/dashboard">Dashboard</Link></div>
             <div><strong>Informasi</strong><a href="#faq">Pertanyaan umum</a><span>Simulasi akademik</span></div>
           </div>
         </div>
