@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
+import { ApplicationDecisionCard } from "@/src/components/common/application-decision-card";
 import { ApplicationDetailModal } from "@/src/components/dashboard/application-detail-modal";
 import { DashboardInsights } from "@/src/components/dashboard/dashboard-insights";
 import { ApplicationList } from "@/src/components/dashboard/application-list";
@@ -105,6 +106,20 @@ export function DashboardClient({
   const role: UserRole = profile.role;
   const evaluator = role === "evaluator";
   const pendingCount = stats.pendingApplications;
+  const latestApplication = applications[0];
+  const latestDecision =
+    !evaluator && page === 1 && !searchQuery && statusFilter === "all"
+      ? latestApplication && latestApplication.status !== "pending"
+        ? latestApplication
+        : null
+      : null;
+
+  function openApplicationDetails(application: DashboardApplication) {
+    setSelected(application);
+    setReviewNote("");
+    setReviewNoteError("");
+    setActionError("");
+  }
 
   async function reviewApplication(
     application: DashboardApplication,
@@ -179,9 +194,12 @@ export function DashboardClient({
             <span className="nav-symbol" aria-hidden="true">⌂</span>
             Ringkasan
           </Link>
-          <Link className="side-nav-link" href="/profile">
+          <Link
+            className="side-nav-link"
+            href={evaluator ? "/evaluator/profile" : "/profile"}
+          >
             <span className="nav-symbol" aria-hidden="true">◎</span>
-            Profil saya
+            {evaluator ? "Profil evaluator" : "Profil saya"}
           </Link>
           {!evaluator && (
             <Link className="side-nav-link" href="/apply">
@@ -266,6 +284,13 @@ export function DashboardClient({
           </div>
         </section>
 
+        {latestDecision && (
+          <ApplicationDecisionCard
+            application={latestDecision}
+            onViewDetails={() => openApplicationDetails(latestDecision)}
+          />
+        )}
+
         {actionError && !selected && (
           <p className="alert alert-error" role="alert">{actionError}</p>
         )}
@@ -318,11 +343,7 @@ export function DashboardClient({
         <ApplicationList
           applications={applications}
           evaluator={evaluator}
-          onSelect={(application) => {
-            setSelected(application);
-            setReviewNote("");
-            setReviewNoteError("");
-          }}
+          onSelect={openApplicationDetails}
           page={page}
           pageSize={pageSize}
           searchQuery={searchQuery}

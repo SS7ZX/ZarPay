@@ -23,6 +23,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .evaluator-analysis-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .evaluator-turnaround-card {
+    grid-column: 1 / -1;
+  }
+
   .form-layout {
     grid-template-columns: minmax(0, 1.4fr) minmax(240px, 0.8fr);
   }
@@ -66,6 +74,14 @@
     width: 100%;
     margin-left: 0;
     padding: 0 22px 22px;
+  }
+
+  .evaluator-analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .evaluator-turnaround-card {
+    grid-column: auto;
   }
 
   .form-main {
@@ -193,6 +209,10 @@
   .section-heading {
     display: block;
     padding: 16px;
+  }
+
+  .evaluator-review-heading > .button {
+    margin-top: 12px;
   }
 
   .table-controls {
@@ -326,6 +346,15 @@
 
   .detail-modal {
     padding: 18px;
+  }
+
+  .application-outcome {
+    padding: 15px;
+  }
+
+  .application-outcome-heading {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .detail-metrics {

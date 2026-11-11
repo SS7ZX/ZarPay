@@ -9,6 +9,7 @@ import type {
 } from "@/src/types";
 import { calculateScore } from "@/src/lib/scoringEngine";
 import { SignOutButton } from "@/src/components/auth/sign-out-button";
+import { ApplicationDecisionCard } from "@/src/components/common/application-decision-card";
 import { BrandLogo } from "@/src/components/common/brand-logo";
 import {
   currencyFormat,
@@ -27,6 +28,7 @@ export interface ProfileApplication {
   risk_tier: RiskTier;
   score_factors: ScoreFactor[];
   status: ApplicationStatus;
+  reviewed_at: string | null;
   review_note: string | null;
   created_at: string;
 }
@@ -298,6 +300,10 @@ export function ProfileOverview({
             <span className="stat-foot">Status pengajuan terbaru</span>
           </article>
         </section>
+
+        {latest && latest.status !== "pending" && (
+          <ApplicationDecisionCard application={latest} />
+        )}
 
         <section className="content-card profile-analysis-card">
           <div className="profile-section-heading profile-analysis-heading">

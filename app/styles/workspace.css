@@ -712,6 +712,111 @@
   color: #32744a;
 }
 
+.application-outcome {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 18px 20px;
+  border: 1px solid;
+  border-radius: 12px;
+}
+
+.application-outcome-approved {
+  border-color: #cce5d2;
+  background: #f3faf4;
+}
+
+.application-outcome-declined {
+  border-color: #eadfcf;
+  background: #fcf8f2;
+}
+
+.application-outcome-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 17px;
+  font-weight: 750;
+}
+
+.application-outcome-approved .application-outcome-icon {
+  background: #e0f1e4;
+  color: #32744a;
+}
+
+.application-outcome-declined .application-outcome-icon {
+  background: #f2e9dc;
+  color: #8d6840;
+}
+
+.application-outcome-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.application-outcome-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.application-outcome-heading .eyebrow {
+  margin: 0 0 5px;
+}
+
+.application-outcome-heading h2 {
+  margin: 0;
+  color: #26382c;
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+
+.application-outcome-description {
+  max-width: 760px;
+  margin: 8px 0 0;
+  color: #66746a;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.application-outcome-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: 10px;
+  color: #758078;
+  font-size: 10px;
+}
+
+.application-outcome-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-left: 3px solid #78b58c;
+  background: rgb(255 255 255 / 68%);
+}
+
+.application-outcome-note strong {
+  color: #536057;
+  font-size: 10px;
+}
+
+.application-outcome-note p {
+  margin: 5px 0 0;
+  color: #59685e;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.application-outcome-link {
+  margin-top: 10px;
+}
+
 .modal-backdrop {
   position: fixed;
   z-index: 10;
@@ -1465,6 +1570,134 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin-bottom: 18px;
+}
+
+.evaluator-profile-cta {
+  margin-top: 12px;
+}
+
+.evaluator-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.evaluator-analysis-card {
+  min-width: 0;
+  padding: 18px;
+}
+
+.evaluator-analysis-card .insight-heading {
+  margin-bottom: 18px;
+}
+
+.evaluator-outcome-track {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #edf0ed;
+}
+
+.evaluator-outcome-track span {
+  height: 100%;
+}
+
+.evaluator-outcome-approved {
+  background: #31965d;
+}
+
+.evaluator-outcome-declined {
+  background: #b9514a;
+}
+
+.evaluator-analysis-legend {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  color: #59665d;
+  font-size: 10px;
+}
+
+.evaluator-analysis-legend span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.evaluator-analysis-legend i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.evaluator-analysis-legend strong {
+  margin-left: auto;
+  color: #334239;
+}
+
+.evaluator-turnaround-value {
+  display: block;
+  margin-top: 7px;
+  color: #203027;
+  font-size: 28px;
+  letter-spacing: -0.8px;
+}
+
+.evaluator-review-history {
+  margin-bottom: 17px;
+}
+
+.evaluator-review-heading {
+  align-items: flex-end;
+}
+
+.evaluator-review-heading h2 {
+  margin-top: 5px;
+}
+
+.evaluator-review-applicant {
+  display: grid;
+  gap: 4px;
+  min-width: 125px;
+}
+
+.evaluator-review-applicant strong {
+  color: #39483f;
+  font-size: 11px;
+}
+
+.evaluator-review-applicant small {
+  color: #929b95;
+  font-size: 9px;
+}
+
+.evaluator-review-score {
+  display: grid;
+  justify-items: start;
+  gap: 5px;
+}
+
+.evaluator-review-score > strong {
+  color: #39483f;
+  font-size: 12px;
+}
+
+.evaluator-review-note {
+  display: inline-block;
+  max-width: 210px;
+  overflow: hidden;
+  color: #68756c;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.evaluator-review-empty {
+  padding: 28px 20px;
 }
 
 .profile-summary-risk {

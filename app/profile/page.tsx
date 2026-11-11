@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import { ConfigMessage } from "@/src/components/common/config-message";
 import { DatabaseSetupMessage } from "@/src/components/common/database-setup-message";
 import {
@@ -36,6 +37,7 @@ async function AuthenticatedProfile() {
   }
 
   const { supabase, profile, email } = authenticated;
+  if (profile.role === "evaluator") redirect("/evaluator/profile");
   const [countResult, applicationsResult] = await Promise.all([
     supabase
       .from("applications")
@@ -44,7 +46,7 @@ async function AuthenticatedProfile() {
     supabase
       .from("applications")
       .select(
-        "id, loan_amount, loan_term_months, estimated_payment, dti_ratio, credit_score, risk_tier, score_factors, status, review_note, created_at",
+        "id, loan_amount, loan_term_months, estimated_payment, dti_ratio, credit_score, risk_tier, score_factors, status, reviewed_at, review_note, created_at",
       )
       .eq("borrower_id", profile.id)
       .order("created_at", { ascending: false })
