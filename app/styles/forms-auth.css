@@ -172,7 +172,7 @@
 }
 
 .form-stack input,
-.application-form input:not([type="checkbox"]) {
+.application-form input:not([type="checkbox"]):not([type="radio"]) {
   width: 100%;
   min-height: 41px;
   padding: 0 11px;
@@ -187,7 +187,7 @@
 }
 
 .form-stack input:focus,
-.application-form input:focus {
+.application-form input:not([type="checkbox"]):not([type="radio"]):focus {
   border-color: #78b58c;
   box-shadow: 0 0 0 3px rgb(23 130 83 / 9%);
 }
