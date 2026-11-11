@@ -1050,3 +1050,295 @@
   line-height: 1.55;
 }
 
+.sidebar {
+  box-shadow: 3px 0 18px rgb(25 55 35 / 2%);
+}
+
+.side-nav-link {
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.side-nav-link:hover {
+  transform: translateX(3px);
+}
+
+.topbar {
+  position: sticky;
+  z-index: 3;
+  top: 0;
+  background: rgb(247 249 246 / 94%);
+  backdrop-filter: blur(12px);
+}
+
+.page-heading h1 {
+  letter-spacing: -1.1px;
+  line-height: 1.25;
+}
+
+.demo-banner {
+  border-radius: 10px;
+  background: #f0f7f2;
+}
+
+.stat-card {
+  min-height: 137px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgb(25 55 35 / 3%);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  border-color: #c6dfce;
+  box-shadow: 0 12px 28px rgb(25 55 35 / 8%);
+}
+
+.dashboard-insights {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 17px;
+  margin-bottom: 22px;
+}
+
+.insight-card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: var(--surface);
+  box-shadow: 0 4px 15px rgb(25 55 35 / 3%);
+}
+
+.insight-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.insight-heading .eyebrow {
+  margin-bottom: 7px;
+}
+
+.insight-heading h2 {
+  margin: 0;
+  color: #203027;
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+
+.insight-heading p:not(.eyebrow) {
+  margin: 6px 0 0;
+  color: #77827a;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.insight-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--green-light);
+  color: var(--green);
+  font-size: 17px;
+}
+
+.risk-distribution {
+  display: grid;
+  gap: 19px;
+}
+
+.risk-item {
+  display: grid;
+  gap: 9px;
+}
+
+.risk-item-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+}
+
+.risk-item-heading > strong {
+  color: #334239;
+  font-size: 12px;
+}
+
+.risk-item-heading small {
+  color: #818d84;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.risk-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #59665d;
+  font-weight: 600;
+}
+
+.risk-indicator {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.risk-label-low .risk-indicator,
+.risk-fill-low {
+  background: #31965d;
+}
+
+.risk-label-moderate .risk-indicator,
+.risk-fill-moderate {
+  background: #b48b32;
+}
+
+.risk-label-elevated .risk-indicator,
+.risk-fill-elevated {
+  background: #cf7736;
+}
+
+.risk-label-high .risk-indicator,
+.risk-fill-high {
+  background: #b9514a;
+}
+
+.risk-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #edf0ed;
+}
+
+.risk-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 250ms ease;
+}
+
+.insight-note {
+  margin: 20px 0 0;
+  padding-top: 13px;
+  border-top: 1px solid var(--line);
+  color: #77827a;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.activity-list {
+  display: grid;
+  gap: 18px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.activity-item > div {
+  display: grid;
+  flex: 1;
+  gap: 4px;
+}
+
+.activity-item > strong {
+  color: #29392f;
+  font-size: 15px;
+}
+
+.activity-item > div strong {
+  color: #3b4940;
+  font-size: 11px;
+}
+
+.activity-item small {
+  color: #818d84;
+  font-size: 10px;
+}
+
+.activity-symbol {
+  display: grid;
+  width: 33px;
+  height: 33px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.activity-pending {
+  background: #fff5e7;
+  color: #a87322;
+}
+
+.activity-approved {
+  background: #eaf6ee;
+  color: #357c4f;
+}
+
+.activity-declined {
+  background: #fbeeed;
+  color: #a9514a;
+}
+
+.activity-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 21px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+  color: #68756c;
+  font-size: 11px;
+}
+
+.activity-total strong {
+  color: var(--green);
+  font-size: 18px;
+}
+
+.content-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 16px rgb(25 55 35 / 3%);
+}
+
+.application-table tbody tr {
+  transition: background 150ms ease;
+}
+
+.application-table tbody tr:hover {
+  background: #f7fbf8;
+}
+
+.detail-modal {
+  border-radius: 20px;
+  box-shadow: 0 25px 80px rgb(0 0 0 / 15%);
+}
+
+.score-summary {
+  border: 1px solid #e4f0e7;
+  border-radius: 14px;
+}
+
+.detail-metrics > div {
+  padding: 13px;
+  border-radius: 10px;
+  background: #f8faf8;
+}
+

@@ -4,7 +4,22 @@ import { LandingSections } from "@/src/components/marketing/landing-sections";
 
 export function LandingPage() {
   return (
-    <main className="landing-page">
+    <main className="landing-page" id="top">
+      <aside className="landing-side-rail" aria-label="Navigasi cepat halaman">
+        <a className="side-rail-brand" href="#top" aria-label="Kembali ke bagian atas">
+          <BrandLogo markOnly />
+        </a>
+        <span className="side-rail-line" aria-hidden="true" />
+        <nav aria-label="Navigasi bagian halaman">
+          <a href="#top" aria-label="Beranda" title="Beranda"><span>01</span></a>
+          <a href="#fitur" aria-label="Fitur" title="Fitur"><span>02</span></a>
+          <a href="#cara-kerja" aria-label="Cara kerja" title="Cara kerja"><span>03</span></a>
+          <a href="#penilaian" aria-label="Skala penilaian" title="Skala penilaian"><span>04</span></a>
+          <a href="#faq" aria-label="Pertanyaan umum" title="Pertanyaan umum"><span>05</span></a>
+        </nav>
+        <a className="side-rail-top" href="#top" aria-label="Kembali ke atas" title="Kembali ke atas">↑</a>
+      </aside>
+
       <header className="landing-header">
         <div className="landing-container landing-nav">
           <Link className="brand-lockup" href="/" aria-label="ZarPay beranda">

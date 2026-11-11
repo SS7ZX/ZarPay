@@ -21,8 +21,8 @@ The public landing page is `/`. Authenticated users work from `/dashboard`; borr
 
 - `app/` contains App Router pages, route handlers, shared layout, and global design tokens.
 - `app/styles/` groups global styles by workspace, authentication/forms, marketing, and responsive behavior.
-- `src/components/marketing/` separates the landing-page shell from its content sections.
-- `src/components/dashboard/` separates dashboard orchestration, the application list, detail/review dialog, and dashboard-specific formatters.
+- `src/components/marketing/` separates the landing-page shell and quick navigation from its content sections.
+- `src/components/dashboard/` separates dashboard orchestration, page-scoped insights, the application list, detail/review dialog, and dashboard-specific formatters.
 - `src/components/forms/` separates application state/submission from result and live-preview presentation.
 - `src/lib/` contains scoring, validation, authentication, and Supabase client helpers.
 - `supabase/migrations/` contains the ordered database schema and hardening migrations.

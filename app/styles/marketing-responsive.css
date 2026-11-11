@@ -464,5 +464,21 @@
   .landing-page *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+    animation: none !important;
+  }
+}
+
+@media (max-width: 1279px) {
+  .landing-side-rail {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .process-step:hover,
+  .audience-card:hover,
+  .footer-links a:hover,
+  .footer-back-top:hover {
+    transform: none;
   }
 }

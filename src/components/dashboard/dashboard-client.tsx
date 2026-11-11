@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/src/lib/supabase/client";
 import { ApplicationDetailModal } from "@/src/components/dashboard/application-detail-modal";
+import { DashboardInsights } from "@/src/components/dashboard/dashboard-insights";
 import { ApplicationList } from "@/src/components/dashboard/application-list";
 import { BrandLogo } from "@/src/components/common/brand-logo";
 import type {
@@ -302,6 +303,10 @@ export function DashboardClient({
           </article>
         </section>
 
+        <DashboardInsights
+          applications={applications}
+          page={page}
+        />
         <ApplicationList
           applications={applications}
           evaluator={evaluator}

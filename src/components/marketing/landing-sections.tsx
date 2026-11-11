@@ -345,6 +345,9 @@ export function LandingSections() {
         <div className="landing-container footer-bottom">
           <span>© ZarPay</span>
           <span>Hasil simulasi bukan keputusan pinjaman.</span>
+          <a className="footer-back-top" href="#top">
+            Kembali ke atas <span aria-hidden="true">↑</span>
+          </a>
         </div>
       </footer>
     </>
