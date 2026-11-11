@@ -138,30 +138,55 @@ export function LandingSections() {
 
       <section className="landing-section process-section" id="cara-kerja">
         <div className="landing-container process-layout">
-          <div className="section-intro process-intro">
-            <span className="landing-eyebrow">Cara kerja</span>
-            <h2>Mulai dari data, lanjutkan dengan hasil</h2>
-            <p>
-              Isi profil keuangan untuk melihat hasil simulasi. Peminjam juga
-              dapat memantau status pengajuan setelah dikirim.
-            </p>
-            <Link className="text-link" href="/login">
-              Masuk atau daftar <span aria-hidden="true">→</span>
-            </Link>
+          <div className="process-preview" role="group" aria-label="Contoh ringkasan simulasi yang belum dihitung">
+            <div className="process-preview-top">
+              <span className="process-preview-mark" aria-hidden="true">Z</span>
+              <span className="process-preview-title">
+                <strong>Ringkasan simulasi</strong>
+                <small>Pratinjau tanpa data contoh</small>
+              </span>
+              <span className="process-preview-status">Belum dihitung</span>
+            </div>
+            <div className="process-preview-result">
+              <span>Hasil simulasi</span>
+              <strong>Menunggu data Anda</strong>
+              <small>Isi profil untuk melihat estimasi dan rincian skor.</small>
+            </div>
+            <div className="process-preview-metrics">
+              <div><span>Estimasi cicilan</span><strong>—</strong></div>
+              <div><span>DTI pascapinjaman</span><strong>—</strong></div>
+            </div>
+            <div className="process-preview-factors">
+              <span>Faktor penilaian</span>
+              <span>DTI · Pendapatan · Pekerjaan · Riwayat kredit · Pinjaman · Tunggakan</span>
+            </div>
           </div>
-          <div className="process-steps">
-            <article className="process-step">
-              <span className="process-icon"><LineIcon name="borrower" /></span>
-              <div><h3>Isi profil keuangan</h3><p>Masukkan pendapatan, kewajiban bulanan, kondisi pekerjaan, dan rencana pinjaman.</p></div>
-            </article>
-            <article className="process-step">
-              <span className="process-icon"><LineIcon name="score" /></span>
-              <div><h3>Tinjau hasil simulasi</h3><p>Lihat estimasi cicilan, rasio DTI, kategori risiko, dan poin dari setiap faktor.</p></div>
-            </article>
-            <article className="process-step">
-              <span className="process-icon"><LineIcon name="review" /></span>
-              <div><h3>Pantau status pengajuan</h3><p>Setelah dikirim, peminjam dapat memeriksa status dan evaluator dapat meninjau pengajuan.</p></div>
-            </article>
+          <div className="process-content">
+            <div className="section-intro process-intro">
+              <span className="landing-eyebrow">Cara kerja</span>
+              <h2>Mulai dari data, lanjutkan dengan hasil</h2>
+              <p>
+                Masukkan angka hipotetis, periksa perhitungannya, lalu pantau
+                status pengajuan melalui dashboard.
+              </p>
+              <Link className="text-link" href="/login">
+                Mulai simulasi <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+            <div className="process-steps">
+              <article className="process-step">
+                <span className="process-icon"><LineIcon name="borrower" /></span>
+                <div><h3>Isi profil keuangan</h3><p>Masukkan pendapatan, kewajiban bulanan, kondisi pekerjaan, dan rencana pinjaman.</p></div>
+              </article>
+              <article className="process-step">
+                <span className="process-icon"><LineIcon name="score" /></span>
+                <div><h3>Tinjau hasil simulasi</h3><p>Lihat estimasi cicilan, rasio DTI, kategori risiko, dan poin dari setiap faktor.</p></div>
+              </article>
+              <article className="process-step">
+                <span className="process-icon"><LineIcon name="review" /></span>
+                <div><h3>Pantau status pengajuan</h3><p>Setelah dikirim, peminjam dapat memeriksa status dan evaluator dapat meninjau pengajuan.</p></div>
+              </article>
+            </div>
           </div>
         </div>
       </section>
@@ -295,10 +320,10 @@ export function LandingSections() {
           <div>
             <span className="landing-eyebrow">Mulai menggunakan ZarPay</span>
             <h2>Lihat perhitungan simulasi Anda</h2>
-            <p>Masuk ke akun atau daftar sebagai peminjam untuk mengisi profil keuangan.</p>
+            <p>Gunakan angka hipotetis untuk menjelajahi hasil dan rincian perhitungan.</p>
           </div>
           <Link className="button landing-cta-button" href="/login">
-            Masuk atau daftar <span aria-hidden="true">→</span>
+            Mulai simulasi <span aria-hidden="true">→</span>
           </Link>
         </div>
       </section>

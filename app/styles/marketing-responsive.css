@@ -15,9 +15,9 @@
     align-items: center;
     gap: 7px;
     padding: 0 9px;
-    border: 1px solid #e1e9e2;
+    border: 1px solid #dfe3d8;
     border-radius: 9px;
-    color: #43574a;
+    color: #424a3f;
     cursor: pointer;
     font-size: 12px;
     font-weight: 700;
@@ -42,10 +42,10 @@
     width: min(240px, calc(100vw - 34px));
     gap: 2px;
     padding: 7px;
-    border: 1px solid #e1e9e2;
+    border: 1px solid #dfe3d8;
     border-radius: 12px;
     background: #fff;
-    box-shadow: 0 14px 36px rgb(35 74 48 / 16%);
+    box-shadow: 0 14px 36px rgb(35 42 27 / 16%);
   }
 
   .landing-mobile-menu nav a {
@@ -54,20 +54,20 @@
     align-items: center;
     padding: 0 11px;
     border-radius: 7px;
-    color: #43574a;
+    color: #424a3f;
     font-size: 13px;
     font-weight: 600;
   }
 
   .landing-mobile-menu nav a:hover,
   .landing-mobile-menu nav a:focus-visible {
-    background: #f0f7f1;
-    color: #24804e;
+    background: #edf5d8;
+    color: #405b1d;
   }
 
   .hero-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 5px;
+    gap: 25px;
   }
 
   .hero-copy h1 {
@@ -78,6 +78,10 @@
   .scoring-layout,
   .faq-layout {
     gap: 35px;
+  }
+
+  .process-preview {
+    padding: 18px;
   }
 
   .feature-grid {
@@ -169,11 +173,26 @@
   .hero-art {
     min-height: 0;
     margin: 0;
+    padding-bottom: 0;
   }
 
   .preview-window {
     width: 100%;
     padding: 16px;
+  }
+
+  .hero-floating-note {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    justify-self: end;
+    margin-top: 10px;
+    padding: 11px 13px;
+  }
+
+  .hero-floating-icon {
+    width: 31px;
+    height: 31px;
   }
 
   .proof-grid {
@@ -264,6 +283,15 @@
   .faq-layout {
     grid-template-columns: 1fr;
     gap: 25px;
+  }
+
+  .process-preview {
+    order: 0;
+  }
+
+  .process-content {
+    order: 1;
+    gap: 18px;
   }
 
   .process-step {

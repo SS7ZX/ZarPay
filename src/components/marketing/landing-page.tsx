@@ -40,7 +40,7 @@ export function LandingPage() {
           <div className="landing-nav-actions">
             <Link className="landing-login-link" href="/login">Masuk</Link>
             <Link className="button button-primary landing-nav-cta" href="/login">
-              Masuk atau daftar
+              Mulai simulasi
             </Link>
           </div>
         </div>
@@ -51,33 +51,34 @@ export function LandingPage() {
           <div className="hero-copy">
             <div className="hero-kicker">
               <span className="hero-kicker-dot" />
-              Simulasi penilaian kredit
+              SIMULATOR KREDIT AKADEMIK
             </div>
             <h1>
-              Hitung cicilan.
+              Simulasikan cicilan.
               <br />
-              <span>Pahami hasilnya.</span>
+              <span>Pahami dampaknya.</span>
             </h1>
             <p className="hero-description">
-              Masukkan pendapatan, kewajiban, dan rencana pinjaman untuk melihat
-              estimasi cicilan, rasio utang terhadap pendapatan (DTI), serta
-              faktor yang membentuk skor.
+              Lihat bagaimana pendapatan, kewajiban, dan rencana pinjaman
+              memengaruhi estimasi cicilan, rasio DTI, serta setiap faktor
+              dalam skor simulasi.
             </p>
             <div className="hero-actions">
               <Link className="button button-primary hero-primary-cta" href="/login">
-                Masuk atau daftar
+                Mulai simulasi <span aria-hidden="true">→</span>
               </Link>
               <a className="hero-secondary-cta" href="#cara-kerja">
-                Lihat cara kerja <span aria-hidden="true">↓</span>
+                Pelajari cara kerja <span aria-hidden="true">↓</span>
               </a>
             </div>
             <div className="hero-footnote">
               <span className="hero-footnote-icon" aria-hidden="true">i</span>
-              Untuk pembelajaran. Gunakan angka hipotetis, bukan data keuangan pribadi.
+              Akademik saja. Gunakan angka hipotetis, bukan data pribadi.
             </div>
           </div>
 
-          <div className="hero-art" role="group" aria-label="Ringkasan simulasi yang menunggu data">
+          <div className="hero-art" role="group" aria-label="Pratinjau ringkasan simulasi tanpa data pengguna">
+            <div className="hero-orbit" aria-hidden="true" />
             <div className="preview-window">
               <div className="preview-window-top">
                 <strong className="preview-brand">Ringkasan simulasi</strong>
@@ -109,6 +110,10 @@ export function LandingPage() {
                 <div><span className="factor-indicator">03</span><span>Riwayat kredit</span></div>
                 <div><span className="factor-indicator">04</span><span>Rencana pinjaman</span></div>
               </div>
+            </div>
+            <div className="hero-floating-note" aria-hidden="true">
+              <span className="hero-floating-icon">↗</span>
+              <span><strong>6 faktor</strong><small>diuraikan secara transparan</small></span>
             </div>
           </div>
         </div>
